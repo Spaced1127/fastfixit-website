@@ -1,0 +1,23 @@
+name = "fastfixit-repairs"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[vars]
+# Exact origins allowed to call the endpoint. No trailing slash.
+# Include both apex and www if you use both. For local testing add
+# "http://localhost:3000" (or whichever port you use).
+SITE_ORIGIN = "http://localhost:3000,https://YOUR-DOMAIN.com,https://www.YOUR-DOMAIN.com"
+
+# Where repair requests are delivered. Comma-separated is allowed.
+TO_EMAIL = "repairs@YOUR-DOMAIN.com"
+
+# Must be a sender on a domain verified in Resend.
+FROM_EMAIL = "FastFixIt Repairs <repairs@YOUR-DOMAIN.com>"
+
+# After the worker is deployed, add a custom domain in the Cloudflare
+# dashboard (Workers & Pages -> your worker -> Settings -> Domains &
+# Routes -> Add custom domain) or uncomment this route.
+# [[routes]]
+# pattern = "api.YOUR-DOMAIN.com"
+# custom_domain = true

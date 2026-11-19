@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Start a repair | FastFixIt Electronics</title>
+  <meta name="description" content="Send a repair request for a game console, controller, handheld, computer, phone or audio device. We reply within one business day with the next step.">
+  <meta name="theme-color" content="#e8e8e3">
+  <meta property="og:title" content="Start a repair | FastFixIt Electronics">
+  <meta property="og:description" content="Send a repair request for a game console, controller, handheld, computer, phone or audio device. We reply within one business day with the next step.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="FastFixIt Electronics">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="index.html" aria-label="FastFixIt Electronics home">
+        <img class="brand-badge" src="assets/brand/badge-96.png" width="46" height="46" alt="">
+        <span class="brand-text">
+          <span class="brand-name">FastFixIt</span>
+          <span class="brand-sub">Electronics</span>
+        </span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="services.html">Services</a>
+        <a href="index.html#process">How it works</a>
+        <a href="about.html">About</a>
+        <a href="index.html#faq">FAQ</a>
+        <a class="nav-cta" href="request.html">Start a repair</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn--sm" href="request.html">Start a repair</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="shell page-head">
+      <div>
+        <h1>Start a repair.</h1>
+        <p class="lede">Tell us what the device is doing. If you have photos, add them; a clear picture of the port or the screen saves a day. We'll reply within one business day.</p>
+      </div>
+      <aside class="page-aside">
+        <h2>Before you send it</h2>
+        <ul>
+          <li>Back up anything you can't lose, if the device still powers on.</li>
+          <li>Find the model number on the label or the bottom of the device.</li>
+          <li>Don't post a swollen battery. Tell us and we'll arrange a safe drop-off.</li>
+        </ul>
+      </aside>
+    </div>
+
+    <section class="form-section" id="request-form">
+      <div class="shell form-layout">
+        <div>
+          <div class="prefill-note" data-prefill-note hidden>
+            From the bench estimate: <span data-prefill-text></span> Add anything you know below.
+          </div>
+
+          <noscript>
+            <style>#repair-form { display: none; }</style>
+            <div class="form-alert">
+              <p>This form needs JavaScript.</p>
+              <p>Please email <a data-contact="email" href="mailto:">[EMAIL]</a> or call <a data-contact="phone" href="tel:">[PHONE]</a> with the device, the fault and your contact details.</p>
+            </div>
+          </noscript>
+
+          <form id="repair-form" class="repair-form" method="post" novalidate>
+            <input class="hp" id="website" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <input id="startedAt" name="startedAt" type="hidden" value="">
+            <input id="estimate" name="estimate" type="hidden" value="">
+
+            <div class="form-alert" data-form-alert hidden role="alert" tabindex="-1">
+              <p data-alert-text>Please check the highlighted fields.</p>
+              <ul data-error-list></ul>
+            </div>
+
+            <fieldset data-reveal>
+              <legend>The device</legend>
+              <p class="form-section-note">The model number is the most useful thing you can give us. It's on the bottom or back of most devices.</p>
+
+              <div class="field-row">
+                <div class="field" data-field="deviceType">
+                  <label for="deviceType">Device type</label>
+                  <select id="deviceType" name="deviceType" required>
+                    <option value="">Choose one</option>
+                    <option value="console">Game console</option>
+                    <option value="controller">Controller</option>
+                    <option value="handheld">Handheld</option>
+                    <option value="computer">Laptop or desktop</option>
+                    <option value="phone">Phone or tablet</option>
+                    <option value="audio">Audio or TV</option>
+                    <option value="other">Something else</option>
+                  </select>
+                  <p class="field-error" id="deviceType-error" hidden></p>
+                </div>
+
+                <div class="field" data-field="model">
+                  <label for="model">Make and model <span class="muted">(if you know it)</span></label>
+                  <input id="model" name="model" type="text" autocomplete="off" placeholder="e.g. PS5 Slim, CFI-2015" aria-describedby="model-hint">
+                  <p class="hint" id="model-hint">Found on the label on the bottom or back.</p>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field" data-field="serial">
+                  <label for="serial">Serial number <span class="muted">(optional)</span></label>
+                  <input id="serial" name="serial" type="text" autocomplete="off">
+                </div>
+
+                <div class="field">
+                  <span class="field-label" id="handoff-label">Drop-off or post?</span>
+                  <div class="radio-row" role="radiogroup" aria-labelledby="handoff-label">
+                    <label for="handoff-drop"><input type="radio" id="handoff-drop" name="handoff" value="Drop off" checked> Drop off</label>
+                    <label for="handoff-post"><input type="radio" id="handoff-post" name="handoff" value="Post it in"> Post it in</label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+
+            <fieldset data-reveal>
+              <legend>The fault</legend>
+              <p class="form-section-note">Describe what it does, not what you think the part is. The symptom is the useful part.</p>
+
+              <div class="field" data-field="faultCategory">
+                <label for="faultCategory">What is it doing?</label>
+                <select id="faultCategory" name="faultCategory" required>
+                  <option value="">Choose one</option>
+                  <option value="power">Won't power on / no power</option>
+                  <option value="video">No picture or video</option>
+                  <option value="audio">No sound or audio fault</option>
+                  <option value="thermal">Overheating or shutting down</option>
+                  <option value="battery">Charging or battery</option>
+                  <option value="controls">Buttons, sticks or triggers</option>
+                  <option value="screen">Screen or glass damage</option>
+                  <option value="liquid">Liquid damage</option>
+                  <option value="media">Disc or media drive</option>
+                  <option value="pairing">Connection or pairing</option>
+                  <option value="port">Damaged port or connector</option>
+                  <option value="other">Something else</option>
+                </select>
+                <p class="field-error" id="faultCategory-error" hidden></p>
+              </div>
+
+              <div class="field" data-field="faultDetails">
+                <label for="faultDetails">Details</label>
+                <textarea id="faultDetails" name="faultDetails" required placeholder="What it does, when it started, and anything you've tried. If it makes a noise, describe it." aria-describedby="faultDetails-hint"></textarea>
+                <p class="hint" id="faultDetails-hint">A sentence is enough. More detail helps us reproduce it.</p>
+                <p class="field-error" id="faultDetails-error" hidden></p>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="previousWork">Has it been worked on before?</label>
+                  <select id="previousWork" name="previousWork">
+                    <option value="">Choose one</option>
+                    <option value="no">No</option>
+                    <option value="self">Yes, by me</option>
+                    <option value="shop">Yes, by another shop</option>
+                    <option value="unsure">Not sure</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="liquid">Has it had contact with liquid?</label>
+                  <select id="liquid" name="liquid">
+                    <option value="">Choose one</option>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                    <option value="unsure">Not sure</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field" data-field="photos" data-photo-field>
+                <span class="field-label" id="photos-label">Photos <span class="muted">(optional, up to 3)</span></span>
+                <input class="file-input" id="photos" name="photos" type="file" accept="image/*" multiple aria-describedby="photos-hint">
+                <label class="file-btn" for="photos">Add photos</label>
+                <p class="hint" id="photos-hint">A clear photo of the port, screen or label helps. We resize them before sending.</p>
+                <p class="field-error" id="photos-error" hidden></p>
+                <p class="hint" data-photo-status aria-live="polite"></p>
+                <ul class="photo-list" data-photo-list></ul>
+              </div>
+            </fieldset>
+
+            <fieldset data-reveal>
+              <legend>You</legend>
+              <p class="form-section-note">We'll use these details to reply and to keep a record of the repair. Nothing else.</p>
+
+              <div class="field-row">
+                <div class="field" data-field="name">
+                  <label for="name">Your name</label>
+                  <input id="name" name="name" type="text" autocomplete="name" required>
+                  <p class="field-error" id="name-error" hidden></p>
+                </div>
+
+                <div class="field" data-field="email">
+                  <label for="email">Email</label>
+                  <input id="email" name="email" type="email" autocomplete="email" required>
+                  <p class="field-error" id="email-error" hidden></p>
+                </div>
+              </div>
+
+              <div class="field" data-field="phone">
+                <label for="phone">Phone <span class="muted">(optional)</span></label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel">
+                <p class="field-error" id="phone-error" hidden></p>
+              </div>
+
+              <div class="field">
+                <span class="field-label" id="contact-label">Preferred contact</span>
+                <div class="radio-row" role="radiogroup" aria-labelledby="contact-label">
+                  <label for="contact-email"><input type="radio" id="contact-email" name="contactMethod" value="Email" checked> Email</label>
+                  <label for="contact-text"><input type="radio" id="contact-text" name="contactMethod" value="Text"> Text</label>
+                  <label for="contact-call"><input type="radio" id="contact-call" name="contactMethod" value="Call"> Call</label>
+                </div>
+              </div>
+
+              <div class="field" data-field="consent">
+                <div class="check-row">
+                  <input id="consent" name="consent" type="checkbox" required>
+                  <label for="consent">I agree to be contacted about this request. See the <a href="privacy.html">privacy note</a>.</label>
+                </div>
+                <p class="field-error" id="consent-error" hidden></p>
+              </div>
+            </fieldset>
+
+            <div class="form-submit" data-reveal>
+              <button class="btn" type="submit">Send repair request</button>
+              <p class="small">We'll only use your details for this repair. No marketing.</p>
+            </div>
+          </form>
+
+          <div class="success-panel" data-success hidden role="status" tabindex="-1">
+            <h2>Request received.</h2>
+            <p class="reference">Reference <span data-success-ref>—</span></p>
+            <p>We'll reply to <strong data-success-email>—</strong> within one business day. If you have more photos, reply to the confirmation email and attach them there.</p>
+            <p>Device: <span data-success-device>—</span></p>
+            <a class="btn" href="index.html">Back to the shop</a>
+          </div>
+        </div>
+
+        <aside class="form-aside">
+          <div class="aside-panel" data-reveal>
+            <h2>What happens next</h2>
+            <ol>
+              <li>We read the request and reply within one business day.</li>
+              <li>Bench diagnosis, usually 24–48 hours.</li>
+              <li>You get a written quote. Nothing happens until you approve it.</li>
+              <li>Repair, then a 24-hour test before it goes home.</li>
+              <li>Collect in person, or we post it back with tracking.</li>
+            </ol>
+          </div>
+
+          <div class="aside-fee" data-reveal>
+            <h2>Bench diagnostic <span data-diagnostic>$45</span></h2>
+            <p>Credited toward the repair if you approve the quote. If we can't find the fault, you pay the bench fee only and get a written explanation.</p>
+          </div>
+
+          <p class="aside-contact" data-reveal>
+            Prefer to talk? Call or text <a data-contact="phone" href="tel:">[PHONE]</a>.<br>
+            Email <a data-contact="email" href="mailto:">[EMAIL]</a>.<br>
+            <span data-contact="hours">[HOURS]</span>
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <div class="shell bench-strip-wrap">
+      <div class="bench-strip">
+        <figure data-reveal>
+          <img src="assets/img/bench-hdmi.webp" width="1200" height="1500" alt="An HDMI port on a game console motherboard.">
+          <figcaption>HDMI ports</figcaption>
+        </figure>
+        <figure data-reveal>
+          <img src="assets/img/bench-stick.webp" width="1200" height="1500" alt="A controller analog stick module held in tweezers." loading="lazy">
+          <figcaption>Stick modules</figcaption>
+        </figure>
+        <figure data-reveal>
+          <img src="assets/img/bench-solder.webp" width="1200" height="1500" alt="A soldering iron reflowing pins on a circuit board." loading="lazy">
+          <figcaption>Board-level work</figcaption>
+        </figure>
+        <figure data-reveal>
+          <img src="assets/img/bench-test.webp" width="1600" height="1067" alt="A multimeter probe on a laptop motherboard." loading="lazy">
+          <figcaption>Power and charge</figcaption>
+        </figure>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img src="assets/brand/badge-192.png" width="58" height="58" alt="" loading="lazy">
+          <div>
+            <p class="footer-name">FastFixIt Electronics</p>
+            <p>Independent board-level repair for consoles, controllers, handhelds, computers and audio gear.</p>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3>Services</h3>
+          <ul>
+            <li><a href="services.html#consoles">Consoles</a></li>
+            <li><a href="services.html#controllers">Controllers &amp; handhelds</a></li>
+            <li><a href="services.html#computers">Computers &amp; phones</a></li>
+            <li><a href="services.html#board-level">Audio, TV &amp; board-level</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Shop</h3>
+          <ul>
+            <li><a href="index.html#process">How it works</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="index.html#faq">FAQ</a></li>
+            <li><a href="request.html">Start a repair</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Contact</h3>
+          <div class="footer-contact">
+            <p><a data-contact="phone" href="tel:">[PHONE]</a></p>
+            <p><a data-contact="email" href="mailto:">[EMAIL]</a></p>
+            <p><span data-contact="address-line1">[STREET ADDRESS]</span><br><span data-contact="address-line2">[CITY, STATE ZIP]</span></p>
+            <p><span data-contact="hours">[HOURS]</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-mark" aria-hidden="true">
+        <p>FastFixIt</p>
+      </div>
+
+      <div class="footer-legal">
+        <p>© <span data-year>2026</span> FastFixIt Electronics, LLC. All rights reserved.</p>
+        <nav aria-label="Legal">
+          <a href="privacy.html">Privacy</a>
+          <a href="index.html#contact">Contact</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/data.js" defer></script>
+  <script src="assets/js/site.js" defer></script>
+  <script src="assets/js/form.js" defer></script>
+</body>
+</html>

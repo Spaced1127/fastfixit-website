@@ -1,0 +1,9 @@
+.taste-skill/
+node_modules/
+worker/node_modules/
+worker/.wrangler/
+worker/.dev.vars
+assets/img/_source/
+.DS_Store
+Thumbs.db
+*.log

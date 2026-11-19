@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FastFixIt Electronics | Console &amp; electronics repair</title>
+  <meta name="description" content="Independent board-level repair for game consoles, controllers, handhelds, laptops, phones and audio gear. Diagnosed in-house, quoted before work starts.">
+  <meta name="theme-color" content="#e8e8e3">
+  <meta property="og:title" content="FastFixIt Electronics | Console &amp; electronics repair">
+  <meta property="og:description" content="Independent board-level repair for game consoles, controllers, handhelds, laptops, phones and audio gear. Diagnosed in-house, quoted before work starts.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="FastFixIt Electronics">
+  <meta name="twitter:card" content="summary">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" as="image" href="assets/img/bench-solder.webp" imagesrcset="assets/img/bench-solder-sm.webp 800w, assets/img/bench-solder.webp 1200w" imagesizes="(max-width: 900px) 90vw, 40vw" fetchpriority="high">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script src="assets/js/boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="index.html" aria-label="FastFixIt Electronics home">
+        <img class="brand-badge" src="assets/brand/badge-96.png" width="46" height="46" alt="">
+        <span class="brand-text">
+          <span class="brand-name">FastFixIt</span>
+          <span class="brand-sub">Electronics</span>
+        </span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="services.html">Services</a>
+        <a href="index.html#process">How it works</a>
+        <a href="about.html">About</a>
+        <a href="index.html#faq">FAQ</a>
+        <a class="nav-cta" href="request.html">Start a repair</a>
+      </nav>
+      <div class="header-actions">
+        <a class="btn btn--sm" href="request.html">Start a repair</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <h1>Board-level repair,<br>no guesswork.</h1>
+          <p class="hero-lede">Consoles, controllers, handhelds, laptops and audio gear, repaired in-house at our bench in <span data-contact="city">[CITY]</span>. You get a written quote before we touch a screwdriver.</p>
+          <div class="hero-actions">
+            <a class="btn" href="request.html">Start a repair</a>
+            <a class="text-link" href="#services">See what we fix <span aria-hidden="true">→</span></a>
+          </div>
+          <ul class="hero-facts">
+            <li>24–48 hour diagnosis</li>
+            <li>Written quote before work</li>
+            <li>90-day workmanship warranty</li>
+          </ul>
+        </div>
+
+        <figure class="hero-media">
+          <div class="hero-frame" data-crossfade>
+            <img class="hero-slide is-active" src="assets/img/bench-solder.webp" srcset="assets/img/bench-solder-sm.webp 800w, assets/img/bench-solder.webp 1200w" sizes="(max-width: 900px) 90vw, 40vw" width="1200" height="1500" alt="A soldering iron reflowing a row of pins on a circuit board." fetchpriority="high">
+            <img class="hero-slide" src="assets/img/bench-hdmi.webp" srcset="assets/img/bench-hdmi-sm.webp 800w, assets/img/bench-hdmi.webp 1200w" sizes="(max-width: 900px) 90vw, 40vw" width="1200" height="1500" alt="An HDMI port on a game console motherboard under magnification." fetchpriority="low">
+            <img class="hero-slide" src="assets/img/bench-stick.webp" srcset="assets/img/bench-stick-sm.webp 800w, assets/img/bench-stick.webp 1200w" sizes="(max-width: 900px) 90vw, 40vw" width="1200" height="1500" alt="A game controller analog stick module held in precision tweezers." fetchpriority="low">
+          </div>
+          <figcaption class="hero-caption">Reflowing a row of pins on a console board, under magnification.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section--surface" id="estimate">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Start with the symptom.</h2>
+          <p class="lede">Pick the device and the fault. You'll see what we'd check, how long it usually takes and where the labour starts. No account, no obligation.</p>
+        </div>
+
+        <div class="estimator" data-estimator>
+          <div class="estimator-controls">
+            <fieldset>
+              <legend>What are you bringing in?</legend>
+              <div class="chips" data-device-chips></div>
+            </fieldset>
+            <fieldset>
+              <legend>What is it doing?</legend>
+              <div class="chips" data-fault-chips></div>
+              <p class="estimator-hint" data-fault-hint>Choose the closest symptom.</p>
+            </fieldset>
+            <p class="estimator-note">This is a bench estimate, not a diagnosis. The written quote comes after we've tested the device. Starting prices are labour only; parts and tax are confirmed before work starts.</p>
+          </div>
+
+          <aside class="ticket" aria-label="Bench estimate">
+            <div class="ticket__head">
+              <span>Bench estimate</span>
+              <span>No obligation</span>
+            </div>
+            <div class="ticket__body">
+              <div class="ticket__row">
+                <span class="ticket__label">Device</span>
+                <span class="ticket__value" data-ticket-device>—</span>
+              </div>
+              <div class="ticket__row">
+                <span class="ticket__label">Fault</span>
+                <span class="ticket__value" data-ticket-fault>Choose a symptom</span>
+              </div>
+              <div class="ticket__row">
+                <span class="ticket__label">What we'd check</span>
+                <span class="ticket__value ticket__value--check" data-ticket-check>—</span>
+              </div>
+              <div class="ticket__row">
+                <span class="ticket__label">Typical bench time</span>
+                <span class="ticket__value" data-ticket-time>—</span>
+              </div>
+              <div class="ticket__row ticket__row--price">
+                <span class="ticket__label">Labour from</span>
+                <span class="ticket__value" data-ticket-price>—</span>
+              </div>
+            </div>
+            <a class="ticket__cta" href="request.html#request-form" data-ticket-cta>Start a repair</a>
+            <p class="ticket__fine">Bench diagnostic <span data-diagnostic>$45</span>, credited toward the repair if you approve the quote. You'll get a written quote before any work.</p>
+          </aside>
+        </div>
+        <noscript>
+          <style>.estimator { display: none; }</style>
+          <p class="estimator-note">The estimate needs JavaScript. You can still <a href="services.html">see the services</a> or <a href="request.html">send a repair request</a>.</p>
+        </noscript>
+        <p class="visually-hidden" aria-live="polite" data-estimate-status></p>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="shell">
+        <div class="section-head">
+          <h2>What comes across the bench.</h2>
+          <p class="lede">Most of our work starts where other shops stop: the port, the trace, the charge circuit. If it isn't here, ask. We'll tell you straight whether it's our kind of job.</p>
+        </div>
+
+        <div class="service-index">
+          <div class="service-group" data-reveal>
+            <h3>Game consoles</h3>
+            <ul>
+              <li>HDMI and port replacement</li>
+              <li>Power and boot faults</li>
+              <li>Overheating and thermal service</li>
+              <li>Disc drives</li>
+              <li>Liquid damage</li>
+              <li>Retro recaps and output mods</li>
+            </ul>
+          </div>
+          <div class="service-group" data-reveal>
+            <h3>Controllers &amp; handhelds</h3>
+            <ul>
+              <li>Stick drift and Hall-effect upgrades</li>
+              <li>Buttons and triggers</li>
+              <li>Screens and digitizers</li>
+              <li>Charge ports and batteries</li>
+              <li>Liquid damage</li>
+              <li>SSD and microSD upgrades</li>
+            </ul>
+          </div>
+          <div class="service-group" data-reveal>
+            <h3>Computers &amp; phones</h3>
+            <ul>
+              <li>No power, no display</li>
+              <li>Charge ports and batteries</li>
+              <li>Keyboards and trackpads</li>
+              <li>Thermal service and fans</li>
+              <li>Phone screens and glass</li>
+              <li>Storage and data transfers</li>
+            </ul>
+          </div>
+          <div class="service-group" data-reveal>
+            <h3>Audio, TV &amp; board-level</h3>
+            <ul>
+              <li>Receivers and amplifiers</li>
+              <li>Turntables</li>
+              <li>TV power and HDMI boards</li>
+              <li>Microsoldering</li>
+              <li>Trace and pad repair</li>
+              <li>Data recovery assessment</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="service-note">
+          <p>Board-level work includes HDMI and USB-C ports, charge circuits, trace repair and liquid damage. <a class="text-link" href="services.html">See the full service list</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--ink" id="process">
+      <div class="shell process-grid">
+        <div class="process-copy" data-reveal>
+          <h2>A repair you can follow.</h2>
+          <p class="lede">You'll know where your device is and what it costs at every step. If a part is back-ordered, we tell you the day we know, not the day it was supposed to arrive.</p>
+          <p class="small">Times are typical for in-stock parts. We confirm the schedule before ordering anything.</p>
+        </div>
+
+        <div class="slip" data-reveal>
+          <div class="slip__head">
+            <span>Typical repair</span>
+            <span>Time at the bench</span>
+          </div>
+          <div class="slip__row">
+            <span class="slip__name">Drop off or post in</span>
+            <span class="slip__time">Same day</span>
+          </div>
+          <div class="slip__row">
+            <span class="slip__name">Bench diagnosis</span>
+            <span class="slip__time">24–48 hours</span>
+          </div>
+          <div class="slip__row">
+            <span class="slip__name">You approve the quote</span>
+            <span class="slip__time">Same day</span>
+          </div>
+          <div class="slip__row">
+            <span class="slip__name">Repair</span>
+            <span class="slip__time">1–3 days</span>
+          </div>
+          <div class="slip__row">
+            <span class="slip__name">Test and collect</span>
+            <span class="slip__time">24-hour test</span>
+          </div>
+          <div class="slip__foot">
+            <span>Written quote before work</span>
+            <span>No surprises</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="standards">
+      <div class="shell">
+        <div class="section-head">
+          <h2>Before it leaves the bench.</h2>
+          <p class="lede">Every repair runs the same test pass. It isn't a five-minute power-on. The results are written on your invoice.</p>
+        </div>
+
+        <div class="standards-grid">
+          <div data-reveal>
+            <figure class="standards-photo">
+              <img src="assets/img/bench-test.webp" srcset="assets/img/bench-test-sm.webp 1000w, assets/img/bench-test.webp 1600w" sizes="(max-width: 1000px) 90vw, 40vw" width="1600" height="1067" alt="A multimeter probe touching a test point on a laptop motherboard, with a bench power supply behind it." loading="lazy">
+              <figcaption>The fault is found by measurement, not by swapping parts until the symptom moves.</figcaption>
+            </figure>
+            <div class="warranty">
+              <h3>90 days on our work.</h3>
+              <p>If our repair fails within 90 days, bring it back and we'll make it right. Parts carry the manufacturer's or supplier's warranty. Damage after the repair isn't covered.</p>
+              <a class="text-link" href="about.html#standards">How we work</a>
+            </div>
+          </div>
+
+          <div data-reveal>
+            <table class="test-table">
+              <thead>
+                <tr>
+                  <th scope="col">Test</th>
+                  <th scope="col">What we check</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Power</td>
+                  <td>Boot, idle, load, sleep and wake. Charge and battery health on portables.</td>
+                </tr>
+                <tr>
+                  <td>Video and audio</td>
+                  <td>Every output, at the highest resolution and refresh rate the device supports.</td>
+                </tr>
+                <tr>
+                  <td>Inputs</td>
+                  <td>Buttons, sticks, triggers, touch, keyboard and trackpad. Dead zones measured, not eyeballed.</td>
+                </tr>
+                <tr>
+                  <td>Wireless</td>
+                  <td>Wi-Fi, Bluetooth, controller pairing and range.</td>
+                </tr>
+                <tr>
+                  <td>Thermals</td>
+                  <td>Fan curve, heatsink contact, idle and load temperatures.</td>
+                </tr>
+                <tr>
+                  <td>Stability</td>
+                  <td>A 24-hour soak test with a real game or workload where the device allows.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--surface" id="shop">
+      <div class="shell">
+        <div class="section-head">
+          <h2>A small bench, on purpose.</h2>
+          <p class="lede">FastFixIt is an independent repair shop in <span data-contact="city">[CITY]</span>. One bench, one technician, and enough time to find the actual fault.</p>
+        </div>
+
+        <div class="about-teaser">
+          <div class="about-photo" data-reveal>
+            <img src="assets/img/bench-wide.webp" srcset="assets/img/bench-wide-sm.webp 1200w, assets/img/bench-wide.webp 1800w" sizes="(max-width: 1000px) 90vw, 65vw" width="1800" height="1200" alt="An electronics repair bench with an opened console board, precision screwdrivers, tweezers and a hot air station." loading="lazy">
+            <div class="about-card">
+              <p>No parts cannon. We measure, then replace.</p>
+              <a class="text-link" href="about.html">About the shop <span aria-hidden="true">→</span></a>
+            </div>
+          </div>
+
+          <aside class="facts-tile" data-reveal>
+            <p class="big">90</p>
+            <p class="big-label">days on our workmanship, in writing on every invoice.</p>
+            <ul>
+              <li><span>Bench</span><span>One</span></li>
+              <li><span>Typical repair</span><span>2–5 days</span></li>
+              <li><span>Specialty</span><span>Board-level</span></li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="shell faq-grid">
+        <div data-reveal>
+          <h2>Straight answers.</h2>
+        </div>
+        <div class="faq-cols" data-reveal>
+          <p><strong>Do you charge to look at it?</strong> Yes. <span data-diagnostic>$45</span> for the bench diagnosis. It comes off the bill if you approve the repair. If we can't find the fault, you pay the bench fee only and get a written explanation.</p>
+          <p><strong>How fast is fast?</strong> Diagnosis is usually 24–48 hours after drop-off. Most repairs are 2–5 business days after approval. Parts can add time; we tell you the day we know.</p>
+          <p><strong>Do you use genuine parts?</strong> Genuine where they're available and make sense. Where they aren't, we use matched-spec parts and tell you which. The part number goes on your invoice.</p>
+          <p><strong>Will I lose my data?</strong> Most hardware repairs don't touch storage. Back up anything you can't lose before you drop off. We never ask for your account passwords; if a test needs a login, you type it in.</p>
+          <p><strong>Can you fix liquid damage?</strong> We assess it, clean the corrosion and repair what the current damaged. We won't promise a result before we see it. Liquid travels, and corrosion can hide under shields.</p>
+          <p><strong>Do you work on modded consoles?</strong> Hardware repairs, yes. We don't install or support pirated software.</p>
+          <p><strong>Do you fix HDMI ports?</strong> Yes. PS5 and Xbox HDMI ports are a common job. We replace them at board level under a microscope and test every output afterwards.</p>
+          <p><strong>Do you ship?</strong> Yes, you can post a device in. Pack it well, include a note with your contact details, and we'll confirm the return shipping cost before we send it back.</p>
+          <p><strong>What if it can't be fixed?</strong> You get a straight diagnosis and the device back. You pay the bench fee only, no repair charge. We'll tell you if a part is unavailable or the board is beyond economical repair.</p>
+          <p><strong>What warranty do you give?</strong> 90 days on our workmanship. Parts carry the manufacturer's or supplier's warranty. Physical damage after the repair isn't covered.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--ink" id="contact">
+      <div class="shell contact-grid">
+        <div class="contact-copy" data-reveal>
+          <h2>Tell us what's broken.</h2>
+          <p class="lede">Send the device, the symptom and a photo if you have one. We'll reply within one business day with the next step.</p>
+          <a class="btn btn--brass" href="request.html">Start a repair</a>
+        </div>
+
+        <dl class="contact-list" data-reveal>
+          <div class="contact-item">
+            <dt>Call or text</dt>
+            <dd><a data-contact="phone" href="tel:">[PHONE]</a></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Email</dt>
+            <dd><a data-contact="email" href="mailto:">[EMAIL]</a></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Bench</dt>
+            <dd><span data-contact="address-line1">[STREET ADDRESS]</span><br><span data-contact="address-line2">[CITY, STATE ZIP]</span><br><a data-map href="#" hidden>Directions</a></dd>
+          </div>
+          <div class="contact-item">
+            <dt>Hours</dt>
+            <dd><span data-contact="hours">[HOURS]</span></dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <img src="assets/brand/badge-192.png" width="58" height="58" alt="" loading="lazy">
+          <div>
+            <p class="footer-name">FastFixIt Electronics</p>
+            <p>Independent board-level repair for consoles, controllers, handhelds, computers and audio gear.</p>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h3>Services</h3>
+          <ul>
+            <li><a href="services.html#consoles">Consoles</a></li>
+            <li><a href="services.html#controllers">Controllers &amp; handhelds</a></li>
+            <li><a href="services.html#computers">Computers &amp; phones</a></li>
+            <li><a href="services.html#board-level">Audio, TV &amp; board-level</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Shop</h3>
+          <ul>
+            <li><a href="index.html#process">How it works</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="index.html#faq">FAQ</a></li>
+            <li><a href="request.html">Start a repair</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h3>Contact</h3>
+          <div class="footer-contact">
+            <p><a data-contact="phone" href="tel:">[PHONE]</a></p>
+            <p><a data-contact="email" href="mailto:">[EMAIL]</a></p>
+            <p><span data-contact="address-line1">[STREET ADDRESS]</span><br><span data-contact="address-line2">[CITY, STATE ZIP]</span></p>
+            <p><span data-contact="hours">[HOURS]</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-mark" aria-hidden="true">
+        <p>FastFixIt</p>
+      </div>
+
+      <div class="footer-legal">
+        <p>© <span data-year>2026</span> FastFixIt Electronics, LLC. All rights reserved.</p>
+        <nav aria-label="Legal">
+          <a href="privacy.html">Privacy</a>
+          <a href="index.html#contact">Contact</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/data.js" defer></script>
+  <script src="assets/js/site.js" defer></script>
+  <script src="assets/js/estimator.js" defer></script>
+</body>
+</html>

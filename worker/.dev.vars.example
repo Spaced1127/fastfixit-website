@@ -1,0 +1,10 @@
+# Copy this file to .dev.vars for local `wrangler dev`.
+# .dev.vars is ignored by git. Never commit real keys.
+
+RESEND_API_KEY = "re_test_replace_me"
+TO_EMAIL = "repairs@YOUR-DOMAIN.com"
+FROM_EMAIL = "FastFixIt Repairs <repairs@YOUR-DOMAIN.com>"
+SITE_ORIGIN = "http://localhost:3000,https://YOUR-DOMAIN.com"
+
+# Optional: set this to test the spam check locally. Leave empty to skip it.
+TURNSTILE_SECRET = ""
