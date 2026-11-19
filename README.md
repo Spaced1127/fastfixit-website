@@ -34,52 +34,49 @@ The visual system is based on **Repair Bench V2**: warm canvas `#f4f1ea`, white 
 Edit **`assets/js/config.js`**. Every page reads from it.
 
 ```js
-phone: "(512) 555-0142",
+phone: "252-320-1212",
 email: "repairs@fastfixitelectronics.com",
-street: "123 Example Ave",
-city: "Austin",
-region: "TX",
-postal: "78701",
+city: "Kinston",
+region: "NC",
 country: "US",
-hours: "Mon–Fri 10–6, Sat 10–2",
-mapUrl: "",
+hours: "Mon-Sat 9AM-7PM",
 formEndpoint: "https://api.fastfixitelectronics.com/repair-request",
-turnstileSiteKey: "",
+turnstileSiteKey: "0x4AAAAAAGIeVmCJ8hgSB8JN",
 siteUrl: "https://fastfixitelectronics.com"
 ```
 
-Empty values show a clearly marked bracket placeholder such as `[PHONE]` or `[CITY]`. `mapUrl` adds a Directions link under the home-page address. `country` is used in structured data.
+There is **no storefront**, so there is no street address or postal code in the config or the markup. Pages show `city, region` only, with drop-off described as by appointment. Empty values show a clearly marked bracket placeholder such as `[PHONE]` or `[CITY]`.
 
 ### 2. Prices, diagnosis and warranty
 
 - **Diagnosis is free.** The estimator uses `diagnostic: 0` in `assets/js/data.js`; any place with `data-diagnostic` renders **Free**. There is no bench fee anywhere in the copy.
 - **Every repair includes a 90-day workmanship warranty.** This is stated on the home page, services page, about page, request page, FAQ and customer email.
-- **Starting prices** for the estimator live in `assets/js/data.js`. They are sample labor prices; change them.
-- The **rate card** on `services.html` is static HTML. Keep it in sync with `data.js`.
-- Confirm these sample promises: 24–48 hour diagnosis, 2–5 day typical repair, 24-hour soak test, written quote before work, one bench, local drop-off or mail-in. Edit the copy if any of that is not true.
+- **Three published starting prices:** HDMI port replacement $100, stick drift $40, no-power faults from $79. Every other fault is `from: null`, which renders as "Quoted after inspection" in the estimator.
+- The **rate card** on `services.html` mirrors those three prices. Keep it in sync with `data.js`.
+- Confirm these sample promises: 24–48 hour diagnosis, 2–5 day typical repair, 24-hour soak test, written quote before work, one bench, drop-off by appointment or mail-in. Edit the copy if any of that is not true.
 - The service lists are deliberately broad. Remove anything you do not take on (phones, TVs, turntables, mail-in), and confirm the equipment list on `about.html`.
 
 ### 3. Mail-in
 
 The request form has a **Drop off / Mail it in** choice. Mail-in adds return address, carrier, tracking number, accessories and a packing confirmation. The API validates the return address and stores it with the request.
 
-The site does **not** publish a shipping label. After a mail-in request, the shop replies with the bench address and packing instructions. Set that address on the Worker as `SHOP_ADDRESS`; the customer auto-reply includes it when present.
+The site does **not** publish a shipping address or label. After a mail-in request, the shop replies with the address and packing instructions. Leave `SHOP_ADDRESS` empty on the Worker and the customer auto-reply says the address follows in that reply; set it only if you want the address printed in the email.
 
 Return shipping is quoted before the device goes back. The customer pays inbound shipping. Confirm both policies.
 
 ### 4. Photographs
 
-The five photographs in `assets/img/` are **AI-generated placeholders**, not photographs of your shop. Replace them with real photos of your bench, tools and work. Keep the same paths and aspect ratios:
+The site now uses the shop's own photos, cropped from the originals in `photos/`. That folder is source material and is ignored by git; the published copies are the `assets/img/*.webp` files.
 
-| File | Crop | Use |
-| --- | --- | --- |
-| `bench-solder.webp` | 4:5 | Hero crossfade |
-| `bench-hdmi.webp` | 4:5 | Hero crossfade, services, about, mail-in |
-| `bench-stick.webp` | 4:5 | Hero crossfade, services, about, mail-in |
-| `bench-wide.webp` | 3:2 | Home shop section, About, Mail-in |
-| `bench-test.webp` | 3:2 | Standards, services, About, Mail-in |
+| File | Crop | Source | Shows |
+| --- | --- | --- | --- |
+| `bench-solder.webp` | 4:5 | `IMG_0404.heic` | Fitted HDMI port, close up |
+| `bench-hdmi.webp` | 4:5 | `IMG_1633.jpg` | HDMI port on a console board |
+| `bench-stick.webp` | 4:5 | `IMG_1158.HEIC` | Switch charge port board |
+| `bench-wide.webp` | 3:2 | `IMG_0810.jpeg` | Console board on the bench |
+| `bench-test.webp` | 3:2 | `IMG_1021.heic` | Damaged HDMI port |
 
-Keep the `-sm.webp` versions for phones. Update the `alt` text when you change a photo.
+Keep the `-sm.webp` versions for phones, and update the `alt` text and any caption when you change a photo. There is no soldering or laptop photo in the set, so the computers section uses the generic bench shot.
 
 ### 5. Privacy note
 
@@ -184,11 +181,11 @@ In `worker/wrangler.toml`:
 ```toml
 SITE_ORIGIN = "https://fastfixitelectronics.com,https://www.fastfixitelectronics.com,https://spaced1127.github.io,http://localhost:3000"
 TO_EMAIL = "repairs@fastfixitelectronics.com"
-FROM_EMAIL = "FastFixIt Repairs <repairs@send.fastfixitelectronics.com>"
-SHOP_ADDRESS = "FastFixIt Electronics, 123 Example Ave, Austin, TX 78701"
+FROM_EMAIL = "FastFixIt Electronics <website@fastfixitelectronics.com>"
+SHOP_ADDRESS = ""
 ```
 
-`SITE_ORIGIN` must match the browser origin exactly: scheme + host, no path, no trailing slash.
+`SITE_ORIGIN` must match the browser origin exactly: scheme + host, no path, no trailing slash. Leave `SHOP_ADDRESS` empty while there is no storefront; the mail-in reply then says the shipping address follows in the shop's own reply.
 
 ### 3. Set secrets
 
@@ -216,17 +213,20 @@ formEndpoint: "https://api.fastfixitelectronics.com/repair-request"
 
 Commit and push.
 
-### 5. Resend (optional email notifications)
+### 5. Resend email notifications
 
-Use a **sending subdomain**, such as `send.fastfixitelectronics.com`, so you do not disturb the IONOS MX/SPF records on the root domain.
+Resend is live. `fastfixitelectronics.com` is the verified sending domain (DKIM at `resend._domainkey`, return path on `send.fastfixitelectronics.com`), and the API key is stored as the Worker secret `RESEND_API_KEY`.
 
-1. In Resend, add `send.fastfixitelectronics.com` as a domain.
-2. Add the DNS records Resend shows. Keep them DNS only.
-3. Create a sending-only API key.
-4. Put the key in the Worker with `npx wrangler secret put RESEND_API_KEY`.
-5. Set `FROM_EMAIL` to an address on the verified subdomain.
+Sending from `website@fastfixitelectronics.com` keeps the shop notification and the customer auto-reply out of the `repairs@` mailbox's own sent folder. Replies go to `TO_EMAIL` because the Worker sets `reply_to`.
 
-Until Resend is configured, the form still stores requests and the request inbox is the notification. The customer sees the standard “we'll reply” message; reply from the inbox or your email.
+If you ever rotate the key:
+
+```powershell
+npx wrangler secret put RESEND_API_KEY
+npx wrangler deploy
+```
+
+If email is not configured, the form still stores requests and the request inbox is the notification.
 
 ### 6. Turnstile
 
@@ -276,7 +276,7 @@ The page is `noindex` and is not linked from the public site. For a stronger loc
 | --- | --- | --- |
 | `RESEND_API_KEY` | yes | Sends shop and customer emails |
 | `TO_EMAIL` | no | Shop inbox (comma-separated allowed) |
-| `FROM_EMAIL` | no | Verified Resend sender on the sending subdomain |
+| `FROM_EMAIL` | no | Verified Resend sender on the verified domain |
 | `SITE_ORIGIN` | no | Allowed browser origins, comma-separated |
 | `SHOP_ADDRESS` | no | Included in mail-in replies when set |
 | `TURNSTILE_SECRET` | yes | Verifies the spam token; optional |
@@ -289,7 +289,7 @@ The page is `noindex` and is not linked from the public site. For a stronger loc
 
 ### Services and estimator
 
-- **`assets/js/data.js`** — the device/fault tree, check text, turnaround and starting labor. `diagnostic: 0` renders as Free.
+- **`assets/js/data.js`** — the device/fault tree, check text, turnaround and starting price. `diagnostic: 0` renders as Free.
 - **`services.html`** — the rate card, service descriptions, at-a-glance facts and warranty.
 - **`index.html`** — hero, promise band, services index, process slip, test table, FAQ.
 
@@ -408,20 +408,20 @@ The spec wants an absolute URL.
 
 ## Launch checklist
 
-- [ ] Fill `assets/js/config.js` (phone, email, address, city, hours, site URL).
-- [ ] Set `formEndpoint` to the deployed Worker.
-- [ ] Set your own starting prices in `assets/js/data.js` and `services.html`.
+- [x] Fill `assets/js/config.js` (phone, email, city, hours, site URL). No street address; there is no storefront.
+- [x] Set `formEndpoint` to the deployed Worker.
+- [x] Set the three published prices in `assets/js/data.js` and `services.html`.
 - [ ] Confirm free diagnosis, 90-day warranty, turnaround and test promises.
-- [ ] Confirm the mail-in return-shipping policy and `SHOP_ADDRESS`.
+- [ ] Confirm the mail-in return-shipping policy and whether `SHOP_ADDRESS` should stay empty.
 - [ ] Remove any service you don't offer and confirm the equipment list.
-- [ ] Replace the five AI photos with real shop photos and update alt text.
+- [x] Replace the five AI photos with real shop photos and update alt text.
 - [ ] Read and adjust `privacy.html`.
-- [ ] Create D1, deploy the Worker, run the schema.
-- [ ] Set `ADMIN_TOKEN`, then bookmark `admin.html` and test it.
-- [ ] Set Resend on a sending subdomain and test both emails.
-- [ ] Set Turnstile site key and secret.
-- [ ] Add the Cloudflare DNS records and set the GitHub Pages custom domain.
-- [ ] Turn on Enforce HTTPS.
+- [x] Create D1, deploy the Worker, run the schema.
+- [x] Set `ADMIN_TOKEN`, then bookmark `admin.html` and test it.
+- [x] Set Resend and test the sending path.
+- [x] Set Turnstile site key and secret.
+- [x] Add the Cloudflare DNS records and set the GitHub Pages custom domain.
+- [x] Turn on Enforce HTTPS.
 - [ ] Check every page at 390, 768 and 1440 px in light and dark.
 - [ ] Check the 404 page, privacy link, mail-in links and footer.
 - [ ] Submit a real drop-off request and a real mail-in request.
@@ -432,5 +432,5 @@ The spec wants an absolute URL.
 
 - Logo: supplied by FastFixIt Electronics.
 - Typeface: [Archivo](https://github.com/Omnibus-Type/Archivo), SIL Open Font License 1.1.
-- Photography: generated placeholder images, not the client's own work. Replace before launch.
-- Built as a static site with a Cloudflare Worker, D1 and optional Resend/Turnstile. No framework, no analytics.
+- Photography: the shop's own photos, cropped from `photos/`.
+- Built as a static site with a Cloudflare Worker, D1, Resend and Turnstile. No framework, no analytics.

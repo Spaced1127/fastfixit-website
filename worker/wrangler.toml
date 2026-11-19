@@ -11,10 +11,11 @@ SITE_ORIGIN = "https://fastfixitelectronics.com,https://www.fastfixitelectronics
 TO_EMAIL = "repairs@fastfixitelectronics.com"
 
 # Must be a sender on a domain verified in Resend.
-FROM_EMAIL = "FastFixIt Repairs <repairs@send.fastfixitelectronics.com>"
+FROM_EMAIL = "FastFixIt Electronics <website@fastfixitelectronics.com>"
 
-# Optional. Included in the shop notification and the mail-in customer reply.
-SHOP_ADDRESS = "FastFixIt Electronics, [STREET ADDRESS], [CITY, STATE ZIP]"
+# No storefront, so this stays empty. The customer reply then says the
+# shipping address follows in the shop's reply instead of printing one.
+SHOP_ADDRESS = ""
 
 # D1 is the request inbox. Create it, then uncomment this block and run
 # the schema file. The form still works with email only when this is off.

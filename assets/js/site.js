@@ -24,17 +24,12 @@
   function contactValues() {
     var cityLine = [config.city, config.region].filter(Boolean).join(", ");
     var cityFull = [cityLine, config.postal].filter(Boolean).join(" ");
-    var streetLine = [config.street, cityFull].filter(Boolean).join(", ");
     return {
       phone: config.phone,
       email: config.email,
       hours: config.hours,
-      street: config.street,
       city: config.city,
-      "city-line": cityFull,
-      address: streetLine,
-      "address-line1": config.street,
-      "address-line2": cityFull
+      "city-line": cityFull
     };
   }
 
@@ -59,15 +54,6 @@
         } else if (key === "email") {
           el.href = "mailto:" + value;
         }
-      }
-    });
-
-    $$("[data-map]").forEach(function (el) {
-      if (config.mapUrl && !isPlaceholder(config.mapUrl)) {
-        el.href = config.mapUrl;
-        el.hidden = false;
-      } else {
-        el.hidden = true;
       }
     });
 
@@ -240,11 +226,11 @@
 
   function initStructuredData() {
     if (!config.siteUrl || isPlaceholder(config.siteUrl)) return;
-    if (isPlaceholder(config.phone) || isPlaceholder(config.street) || isPlaceholder(config.city)) return;
+    if (isPlaceholder(config.phone) || isPlaceholder(config.city)) return;
 
     var payload = {
       "@context": "https://schema.org",
-      "@type": "ElectronicsStore",
+      "@type": "LocalBusiness",
       name: "FastFixIt Electronics, LLC",
       url: config.siteUrl,
       image: config.siteUrl.replace(/\/$/, "") + "/assets/img/bench-wide.webp",
@@ -252,11 +238,14 @@
       priceRange: "$$",
       address: {
         "@type": "PostalAddress",
-        streetAddress: config.street,
         addressLocality: config.city,
         addressRegion: config.region || undefined,
         postalCode: config.postal || undefined,
         addressCountry: config.country || "US"
+      },
+      areaServed: {
+        "@type": "City",
+        name: config.city
       }
     };
 

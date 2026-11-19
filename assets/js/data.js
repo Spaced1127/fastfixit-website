@@ -21,7 +21,7 @@ window.FFI_DATA = {
           category: "power",
           check: "Standby rail, power supply and the first-stage regulators. We check for a short before applying power.",
           time: "2–4 days",
-          from: 95
+          from: 79
         },
         {
           id: "no-video",
@@ -29,7 +29,7 @@ window.FFI_DATA = {
           category: "video",
           check: "HDMI port pins, the encoder and the filter network behind it. We test the cable and display first.",
           time: "2–4 days",
-          from: 145
+          from: 100
         },
         {
           id: "overheat",
@@ -37,7 +37,7 @@ window.FFI_DATA = {
           category: "thermal",
           check: "Fan curve, heatsink contact, thermal compound and the temperature sensors under load.",
           time: "2–3 days",
-          from: 75
+          from: null
         },
         {
           id: "disc",
@@ -45,7 +45,7 @@ window.FFI_DATA = {
           category: "media",
           check: "Laser, spindle motor and the drive board. We test with a known-good disc.",
           time: "3–5 days",
-          from: 95
+          from: null
         },
         {
           id: "port",
@@ -53,7 +53,7 @@ window.FFI_DATA = {
           category: "port",
           check: "The port, its pads and the traces behind it. We replace at board level when the pads are sound.",
           time: "2–4 days",
-          from: 95
+          from: null
         },
         {
           id: "liquid",
@@ -61,7 +61,7 @@ window.FFI_DATA = {
           category: "liquid",
           check: "Corrosion under the shields, damaged traces and any parts that took current. We clean and assess before quoting.",
           time: "3–5 days",
-          from: 95
+          from: null
         },
         {
           id: "other",
@@ -69,7 +69,7 @@ window.FFI_DATA = {
           category: "other",
           check: "A visual inspection and a bench test first, then a straight answer about what we found.",
           time: "2–4 days",
-          from: 95
+          from: null
         }
       ]
     },
@@ -83,7 +83,7 @@ window.FFI_DATA = {
           category: "controls",
           check: "Stick module wear, dead zone and calibration. We replace the module and recalibrate.",
           time: "1–2 days",
-          from: 45
+          from: 40
         },
         {
           id: "buttons",
@@ -91,7 +91,7 @@ window.FFI_DATA = {
           category: "controls",
           check: "Contacts, membranes, tact switches and the trigger mechanism.",
           time: "1–2 days",
-          from: 35
+          from: null
         },
         {
           id: "charge",
@@ -99,7 +99,7 @@ window.FFI_DATA = {
           category: "battery",
           check: "Charge port, battery health and the charging circuit.",
           time: "1–2 days",
-          from: 55
+          from: null
         },
         {
           id: "pairing",
@@ -107,7 +107,7 @@ window.FFI_DATA = {
           category: "pairing",
           check: "Radio, pairing button and the antenna. We test on a known-good console.",
           time: "1–2 days",
-          from: 35
+          from: null
         },
         {
           id: "liquid",
@@ -115,7 +115,7 @@ window.FFI_DATA = {
           category: "liquid",
           check: "Corrosion on the board and under the buttons. We clean and assess before quoting.",
           time: "2–3 days",
-          from: 45
+          from: null
         },
         {
           id: "other",
@@ -123,7 +123,7 @@ window.FFI_DATA = {
           category: "other",
           check: "A bench test and a look inside, then a straight answer.",
           time: "1–2 days",
-          from: 35
+          from: null
         }
       ]
     },
@@ -137,7 +137,7 @@ window.FFI_DATA = {
           category: "screen",
           check: "Panel, digitizer and the ribbon connector. We test touch, brightness and color after.",
           time: "2–4 days",
-          from: 95
+          from: null
         },
         {
           id: "charge",
@@ -145,7 +145,7 @@ window.FFI_DATA = {
           category: "battery",
           check: "Charge port, battery health and the charging IC.",
           time: "2–4 days",
-          from: 75
+          from: null
         },
         {
           id: "battery",
@@ -153,7 +153,7 @@ window.FFI_DATA = {
           category: "battery",
           check: "Battery health, charge cycle count and standby drain.",
           time: "1–3 days",
-          from: 55
+          from: null
         },
         {
           id: "drift",
@@ -161,7 +161,7 @@ window.FFI_DATA = {
           category: "controls",
           check: "Stick module wear and calibration. We replace the module where parts allow.",
           time: "1–3 days",
-          from: 45
+          from: 40
         },
         {
           id: "liquid",
@@ -169,7 +169,7 @@ window.FFI_DATA = {
           category: "liquid",
           check: "Corrosion under the shields and damaged traces. We clean and assess before quoting.",
           time: "3–5 days",
-          from: 95
+          from: null
         },
         {
           id: "no-power",
@@ -177,7 +177,7 @@ window.FFI_DATA = {
           category: "power",
           check: "Standby rail, power button and the first-stage regulators.",
           time: "2–4 days",
-          from: 95
+          from: 79
         },
         {
           id: "other",
@@ -185,7 +185,7 @@ window.FFI_DATA = {
           category: "other",
           check: "A bench test and a look inside, then a straight answer.",
           time: "2–4 days",
-          from: 75
+          from: null
         }
       ]
     },
@@ -199,7 +199,7 @@ window.FFI_DATA = {
           category: "power",
           check: "Standby circuit, charge IC, battery and the power button.",
           time: "2–5 days",
-          from: 95
+          from: 79
         },
         {
           id: "no-display",
@@ -207,7 +207,7 @@ window.FFI_DATA = {
           category: "video",
           check: "Panel, backlight, display cable and GPU output.",
           time: "2–5 days",
-          from: 95
+          from: null
         },
         {
           id: "charge",
@@ -215,7 +215,7 @@ window.FFI_DATA = {
           category: "battery",
           check: "Charge port, its pads and the charging circuit.",
           time: "2–4 days",
-          from: 95
+          from: null
         },
         {
           id: "keyboard",
@@ -223,7 +223,7 @@ window.FFI_DATA = {
           category: "controls",
           check: "Key switches, membrane, ribbon and trackpad cable.",
           time: "2–4 days",
-          from: 75
+          from: null
         },
         {
           id: "thermal",
@@ -231,7 +231,7 @@ window.FFI_DATA = {
           category: "thermal",
           check: "Fan, heatsink, thermal compound and the fan curve under load.",
           time: "1–3 days",
-          from: 75
+          from: null
         },
         {
           id: "liquid",
@@ -239,7 +239,7 @@ window.FFI_DATA = {
           category: "liquid",
           check: "Corrosion, damaged traces and parts that took current. We clean and assess before quoting.",
           time: "3–7 days",
-          from: 95
+          from: null
         },
         {
           id: "storage",
@@ -247,7 +247,7 @@ window.FFI_DATA = {
           category: "other",
           check: "Drive health, memory test and the replacement path. Data transfer is quoted separately.",
           time: "1–3 days",
-          from: 75
+          from: null
         },
         {
           id: "other",
@@ -255,7 +255,7 @@ window.FFI_DATA = {
           category: "other",
           check: "A bench test and a look inside, then a straight answer.",
           time: "2–5 days",
-          from: 95
+          from: null
         }
       ]
     },
@@ -269,7 +269,7 @@ window.FFI_DATA = {
           category: "screen",
           check: "Panel and digitizer. We check touch and brightness after.",
           time: "1–3 days",
-          from: 85
+          from: null
         },
         {
           id: "battery",
@@ -277,7 +277,7 @@ window.FFI_DATA = {
           category: "battery",
           check: "Battery health, charge port and the charging circuit.",
           time: "1–3 days",
-          from: 65
+          from: null
         },
         {
           id: "port",
@@ -285,7 +285,7 @@ window.FFI_DATA = {
           category: "port",
           check: "Port, pads and the traces behind it. Board-level where the pads are sound.",
           time: "2–4 days",
-          from: 75
+          from: null
         },
         {
           id: "liquid",
@@ -293,7 +293,7 @@ window.FFI_DATA = {
           category: "liquid",
           check: "Corrosion, current damage and data risk. We assess before quoting.",
           time: "2–5 days",
-          from: 95
+          from: null
         },
         {
           id: "data",
@@ -309,7 +309,7 @@ window.FFI_DATA = {
           category: "other",
           check: "A bench test and a look inside, then a straight answer.",
           time: "2–4 days",
-          from: 65
+          from: null
         }
       ]
     },
@@ -323,7 +323,7 @@ window.FFI_DATA = {
           category: "power",
           check: "Power supply, protection circuit and output stage.",
           time: "3–5 days",
-          from: 85
+          from: 79
         },
         {
           id: "no-sound",
@@ -331,7 +331,7 @@ window.FFI_DATA = {
           category: "audio",
           check: "Inputs, relays, output stage and speaker terminals.",
           time: "3–5 days",
-          from: 75
+          from: null
         },
         {
           id: "hdmi",
@@ -339,7 +339,7 @@ window.FFI_DATA = {
           category: "video",
           check: "HDMI port, switch and the board's power rails.",
           time: "3–5 days",
-          from: 85
+          from: 100
         },
         {
           id: "caps",
@@ -347,7 +347,7 @@ window.FFI_DATA = {
           category: "audio",
           check: "Power supply capacitors, regulators and the output stage.",
           time: "3–5 days",
-          from: 75
+          from: null
         },
         {
           id: "turntable",
@@ -355,7 +355,7 @@ window.FFI_DATA = {
           category: "audio",
           check: "Belt, bearing, tonearm and cartridge alignment. We test the output.",
           time: "3–5 days",
-          from: 75
+          from: null
         },
         {
           id: "other",
@@ -363,7 +363,7 @@ window.FFI_DATA = {
           category: "other",
           check: "A bench test and a look inside, then a straight answer.",
           time: "3–5 days",
-          from: 75
+          from: null
         }
       ]
     },
@@ -377,7 +377,7 @@ window.FFI_DATA = {
           category: "other",
           check: "A visual inspection and a bench test first, then a straight answer about what we found.",
           time: "2–5 days",
-          from: 45
+          from: null
         }
       ]
     }
