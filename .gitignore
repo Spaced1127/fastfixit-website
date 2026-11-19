@@ -5,6 +5,7 @@ worker/.wrangler/
 worker/.dev.vars
 .admin-token.txt
 .tracker-token.txt
+.tracker-admin.txt
 assets/img/_source/
 photos/
 .DS_Store
