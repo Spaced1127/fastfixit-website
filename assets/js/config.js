@@ -13,14 +13,13 @@ window.FFI_CONFIG = {
   email: "repairs@fastfixitelectronics.com",
 
   // Shop address. `city` is also used in body copy around the site.
-  street: "",
   city: "Kinston",
   region: "NC",
   postal: "",
   country: "US",
 
   // Opening hours, as one line. e.g. "Mon–Fri 10–6, Sat 10–2"
-  hours: "",
+  hours: "Mon-Sat 9AM-7PM",
 
   // Optional link to a map listing (Google, Apple, OpenStreetMap).
   mapUrl: "",
