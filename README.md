@@ -306,7 +306,7 @@ Archivo is self-hosted in `assets/fonts/archivo-var.woff2` under the SIL Open Fo
 
 ### 404
 
-GitHub Pages serves `404.html` automatically for missing paths on the custom domain. If you use a project path (`username.github.io/repo/`), it works there too.
+GitHub Pages serves `404.html` for missing paths on the custom domain. On the `github.io` project preview, GitHub may show its own bare 404 for unknown paths; the page is still available directly at `/404.html`. Once the custom domain is active, the site sits at the root and the custom 404 applies.
 
 ### Sitemap and social preview
 
