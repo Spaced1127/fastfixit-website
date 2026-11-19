@@ -697,6 +697,23 @@ html[data-theme="dark"] .theme-icon-sun {
   font-size: 0.9375rem;
 }
 
+.turnstile-widget {
+  flex-basis: 100%;
+  min-height: 65px;
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.turnstile-widget:empty {
+  min-height: 0;
+}
+
+.turnstile-widget iframe {
+  display: block;
+  max-width: 100%;
+}
+
 .radio-row label,
 .check-row label {
   color: var(--ink);

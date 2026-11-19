@@ -409,17 +409,17 @@
       try {
         turnstileId = window.turnstile.render(turnstileWidget, {
           sitekey: config.turnstileSiteKey,
-          theme: "light",
+          theme: document.documentElement.dataset.theme === "dark" ? "dark" : "light",
           action: "repair-request"
         });
       } catch (error) {
         turnstileFailed = true;
-        turnstileWidget.textContent = "Verification could not start. Please email us instead.";
+        turnstileWidget.textContent = "Verification could not start. Refresh the page and try again.";
       }
     };
     script.onerror = function () {
       turnstileFailed = true;
-      turnstileWidget.textContent = "Verification could not load. Please email us instead.";
+      turnstileWidget.textContent = "Verification could not load. Refresh the page, or send the request by email.";
     };
     document.head.appendChild(script);
   }
@@ -530,7 +530,7 @@
         return;
       }
     } else if (turnstileFailed) {
-      showFailure("The spam check could not load. Please email the shop directly.");
+      showFailure("The spam check could not load. Refresh the page and try again.");
       return;
     }
 
