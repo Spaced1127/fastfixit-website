@@ -7,15 +7,15 @@
 
 window.FFI_CONFIG = {
   // Contact details. Examples:
-  //   phone: "(512) 555-0142"
-  //   email: "repairs@fastfixit.com"
-  phone: "",
-  email: "",
+  //   phone: "252-320-1212"
+  //   email: "repairs@fastfixitelectronics.com"
+  phone: "252-320-1212",
+  email: "repairs@fastfixitelectronics.com",
 
   // Shop address. `city` is also used in body copy around the site.
   street: "",
-  city: "",
-  region: "",
+  city: "Kinston",
+  region: "NC",
   postal: "",
   country: "US",
 
