@@ -335,45 +335,10 @@ front, but the Worker must be allowed through.
 
 ### The shop server
 
-The tracker runs on a small Ubuntu VPS at `23.95.234.41`, behind Caddy at
-`https://tracker.fastfixitelectronics.com`. Facts you need later:
-
-| Item | Value |
-| --- | --- |
-| Code | `/opt/repairbench` (branch `feat/website-intake`) |
-| Web service | `repairbench.service`, started by systemd, listens on `127.0.0.1:3000` |
-| Database | PostgreSQL 17 in Docker (`repairbench-postgres-1`), data in the `repairbench_postgres-data` volume |
-| Proxy | Caddy, config at `/etc/caddy/Caddyfile`, certificate managed automatically |
-| Logs | `journalctl -u repairbench -f` |
-| Config | `/opt/repairbench/.env` (mode 600) |
-| Admin login | see `.tracker-admin.txt` in this folder; change the password after first sign-in |
-
-Common commands:
-
-```bash
-# restart the app
-systemctl restart repairbench
-
-# update from GitHub
-cd /opt/repairbench && git pull && npm ci --include=dev && npm run build
-cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/ 2>/dev/null || true
-systemctl restart repairbench
-
-# logs
-journalctl -u repairbench -n 100 --no-pager
-```
-
-`NODE_PATH=/opt/repairbench/node_modules` is required for the build in this
-environment; it is set in the deploy shell, not in the service.
-
-Email from the tracker (quotes, invoices, portal messages) is off until
-`SMTP_*` is set in `/opt/repairbench/.env`. The website's own Resend emails are
-separate and already work.
-
-Stripe payments need `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` in the
-same file, with the webhook pointing at
-`https://tracker.fastfixitelectronics.com/api/stripe/webhook`. Restart the
-service after changing `.env`.
+Deployment and operations notes for the tracker live in the private
+RepairTrackerV2 repository (`docs/FFI-SERVER.md`), not here. This public
+repository should not carry server addresses, filesystem paths, or credential
+file names.
 
 ### Database migration
 
