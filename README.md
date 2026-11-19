@@ -316,6 +316,16 @@ The page is `noindex` and is not linked from the public site. For a stronger loc
 
 Replace a `.webp` at the same path. Archivo is self-hosted in `assets/fonts/archivo-var.woff2` under the SIL Open Font License; the license is in `assets/fonts/OFL.txt`. The 404 page is `404.html`.
 
+### Asset versions
+
+CSS and JS are linked with a version query, for example `assets/js/form.js?v=20261119b`. GitHub Pages caches assets for about ten minutes and browsers keep them longer, so a returning visitor can otherwise run an old script against new HTML. After editing anything in `assets/css/` or `assets/js/`, bump the version string in every page. One command does it:
+
+```powershell
+node -e "const fs=require('fs');for(const f of ['index.html','services.html','mail-in.html','about.html','request.html','admin.html','privacy.html','404.html']){let h=fs.readFileSync(f,'utf8');h=h.replace(/assets\/(css|js)\/([a-z0-9-]+\.(css|js))\?v=[^\"']+/g,'assets/$1/$2?v=NEWVERSION');fs.writeFileSync(f,h)}"
+```
+
+Replace `NEWVERSION` with today's date and a letter, such as `20261119c`.
+
 ### Sitemap and social preview
 
 There is no `sitemap.xml` because the site is still being moved to its domain. Submit the domain in Google Search Console when it is live. Add an Open Graph image after a real photo is available:
