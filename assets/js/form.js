@@ -24,6 +24,9 @@
   var turnstileId = null;
   var turnstileFailed = false;
   var photos = [];
+  var mailInFields = document.querySelector("[data-mailin-fields]");
+  var handoffRadios = form.querySelectorAll('input[name="handoff"]');
+  var mailInFieldIds = ["returnStreet", "returnCity", "returnState", "returnZip", "packingAck"];
 
   if (startedAt) startedAt.value = String(Date.now());
   if (!endpoint && photoField) photoField.hidden = true;
@@ -38,8 +41,24 @@
     return null;
   }
 
+  function isMailIn() {
+    var selected = form.querySelector('input[name="handoff"]:checked');
+    return !!selected && selected.value === "Mail it in";
+  }
+
+  function syncMailIn() {
+    if (!mailInFields) return;
+    var on = isMailIn();
+    mailInFields.hidden = !on;
+    if (!on) mailInFieldIds.forEach(clearError);
+  }
+
   function prefill() {
     var params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "mail") {
+      var mailRadio = document.getElementById("handoff-mail");
+      if (mailRadio) mailRadio.checked = true;
+    }
     var deviceId = params.get("device");
     var faultId = params.get("fault");
     if (!deviceId) return;
@@ -159,6 +178,25 @@
     if (details.length < 12) errors.push(["faultDetails", "Add a sentence about what it's doing."]);
     if (!consent || !consent.checked) errors.push(["consent", "Confirm we can contact you about this request."]);
 
+    if (isMailIn()) {
+      if (value("returnStreet").length < 4) {
+        errors.push(["returnStreet", "Add the street address for the return shipment."]);
+      }
+      if (value("returnCity").length < 2) {
+        errors.push(["returnCity", "Add the city."]);
+      }
+      if (!/^[A-Za-z]{2}$/.test(value("returnState"))) {
+        errors.push(["returnState", "Use the two-letter state code."]);
+      }
+      if (!/^\d{5}(-\d{4})?$/.test(value("returnZip"))) {
+        errors.push(["returnZip", "Add a five-digit ZIP code."]);
+      }
+      var packing = document.getElementById("packingAck");
+      if (!packing || !packing.checked) {
+        errors.push(["packingAck", "Confirm you'll pack it securely."]);
+      }
+    }
+
     var total = photos.reduce(function (sum, item) {
       return sum + item.blob.size;
     }, 0);
@@ -169,7 +207,7 @@
   }
 
   function showErrors(errors) {
-    ["name", "email", "phone", "deviceType", "faultCategory", "faultDetails", "consent", "photos"].forEach(clearError);
+    ["name", "email", "phone", "deviceType", "faultCategory", "faultDetails", "consent", "photos", "returnStreet", "returnCity", "returnState", "returnZip", "packingAck"].forEach(clearError);
 
     if (!errors.length) {
       if (alertBox) alertBox.hidden = true;
@@ -201,7 +239,7 @@
     }
   }
 
-  ["name", "email", "phone", "deviceType", "faultCategory", "faultDetails", "consent"].forEach(function (id) {
+  ["name", "email", "phone", "deviceType", "faultCategory", "faultDetails", "consent", "returnStreet", "returnCity", "returnState", "returnZip", "packingAck"].forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
     var clear = function () {
@@ -209,6 +247,10 @@
     };
     el.addEventListener("input", clear);
     el.addEventListener("change", clear);
+  });
+
+  Array.prototype.forEach.call(handoffRadios, function (radio) {
+    radio.addEventListener("change", syncMailIn);
   });
 
   /* ------------------------------------------------------------
@@ -402,6 +444,9 @@
   }
 
   function buildSummary() {
+    var cityLine = [value("returnCity"), value("returnState").toUpperCase()].filter(Boolean).join(", ");
+    var returnAddress = [value("returnStreet"), cityLine, value("returnZip")].filter(Boolean).join(", ");
+
     return {
       name: value("name"),
       email: value("email"),
@@ -417,7 +462,16 @@
       previous: labelOf("previousWork"),
       liquid: labelOf("liquid"),
       handoff: radioLabel("handoff"),
-      estimate: value("estimate")
+      estimate: value("estimate"),
+      mailIn: isMailIn(),
+      returnStreet: value("returnStreet"),
+      returnCity: value("returnCity"),
+      returnState: value("returnState").toUpperCase(),
+      returnZip: value("returnZip"),
+      returnAddress: returnAddress,
+      shippingCarrier: value("shippingCarrier"),
+      trackingNumber: value("trackingNumber"),
+      accessories: value("accessories")
     };
   }
 
@@ -441,8 +495,17 @@
       "Details: " + summary.details,
       "Worked on before: " + summary.previous,
       "Liquid contact: " + summary.liquid,
-      "Drop-off or post: " + summary.handoff
+      "Drop-off or mail-in: " + summary.handoff
     ];
+
+    if (summary.mailIn) {
+      lines.push(
+        "Return shipping address: " + (summary.returnAddress || "—"),
+        "Carrier: " + (summary.shippingCarrier || "Not shipped yet"),
+        "Tracking number: " + (summary.trackingNumber || "—"),
+        "Accessories included: " + (summary.accessories || "—")
+      );
+    }
     var href = "mailto:" + email + "?subject=" + encodeURIComponent("Repair request — " + summary.device + " — " + summary.name) + "&body=" + encodeURIComponent(lines.join("\n"));
     window.location.href = href;
     showFailure("Your email app should open with the request. Send it, and attach any photos there. If nothing opened, email " + email + " directly.");
@@ -499,6 +562,15 @@
         liquid: summary.liquid,
         handoff: summary.handoff,
         estimate: summary.estimate,
+        mailIn: summary.mailIn,
+        returnStreet: summary.returnStreet,
+        returnCity: summary.returnCity,
+        returnState: summary.returnState,
+        returnZip: summary.returnZip,
+        returnAddress: summary.returnAddress,
+        shippingCarrier: summary.shippingCarrier,
+        trackingNumber: summary.trackingNumber,
+        accessories: summary.accessories,
         website: value("website"),
         startedAt: Number(value("startedAt")) || 0,
         turnstileToken: turnstileId !== null && window.turnstile ? window.turnstile.getResponse(turnstileId) : "",
@@ -538,6 +610,8 @@
         if (ref) ref.textContent = result.reference || "—";
         if (email) email.textContent = summary.email;
         if (device) device.textContent = summary.device + " — " + summary.faultLabel;
+        var mailinSuccess = successPanel.querySelector("[data-success-mailin]");
+        if (mailinSuccess) mailinSuccess.hidden = !summary.mailIn;
         successPanel.focus();
         var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         successPanel.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
@@ -556,5 +630,6 @@
 
   form.addEventListener("submit", submit);
   prefill();
+  syncMailIn();
   initTurnstile();
 })();

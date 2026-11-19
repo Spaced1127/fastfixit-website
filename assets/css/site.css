@@ -13,20 +13,41 @@
 }
 
 :root {
-  --paper: #e8e8e3;
-  --paper-2: #dcdcd6;
-  --paper-3: #d0d0c9;
-  --ink: #161512;
-  --ink-2: #201e1a;
-  --ink-3: #2a2721;
-  --muted: #45443e;
-  --on-ink: #ecebe6;
-  --on-ink-muted: #b7b6ae;
-  --brass: #c9a227;
-  --brass-dark: #b08b1e;
-  --error: #9e2418;
-  --field: #f2f1ec;
+  /* Repair Bench V2 tokens */
+  --paper: #f4f1ea;
+  --paper-2: #ece8df;
+  --paper-3: #e3ded3;
+  --surface: #ffffff;
+  --surface-muted: #ece8df;
+  --ink: #17191c;
+  --ink-2: #1f2227;
+  --ink-3: #2a2e36;
+  --muted: #4b4f55;
+  --on-ink: #ecedef;
+  --on-ink-muted: #a8b0b9;
+  --accent: #c2410c;
+  --accent-hover: #9a3309;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe9e1;
+  --brass: #c2410c;
+  --brass-dark: #9a3309;
+  --success: #227a4b;
+  --warning: #a86400;
+  --info: #2563eb;
+  --error: #b42318;
+  --danger-soft: #fbe9e7;
+  --field: #ffffff;
+  --line: #d9d5cb;
+  --line-strong: #b9b3a6;
+  --band: #17191c;
+  --band-2: #22252b;
+  --band-line: #2b3038;
+  --band-ink: #ecedef;
+  --band-muted: #a8b0b9;
+  --card-muted: #4b4f55;
   --font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --radius: 8px;
+  --radius-lg: 12px;
 
   --step-0: 0.875rem;
   --step-1: 1.0625rem;
@@ -38,7 +59,43 @@
   --max: 1320px;
   --gap: clamp(16px, 2vw, 28px);
   --section: clamp(76px, 8.5vw, 128px);
-  --focus: var(--ink);
+  --focus: var(--accent);
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0f1114;
+  --paper-2: #171a1f;
+  --paper-3: #1e2228;
+  --surface: #171a1f;
+  --surface-muted: #1e2228;
+  --ink: #ecedef;
+  --ink-2: #f1f2f4;
+  --ink-3: #2a2e36;
+  --muted: #aeb5be;
+  --on-ink: #ecedef;
+  --on-ink-muted: #a8b0b9;
+  --accent: #ff7a3d;
+  --accent-hover: #ff965f;
+  --accent-ink: #0f1114;
+  --accent-soft: #2a1a12;
+  --brass: #ff7a3d;
+  --brass-dark: #ff965f;
+  --success: #5dd39e;
+  --warning: #fbbf24;
+  --info: #60a5fa;
+  --error: #f87171;
+  --danger-soft: #3a1d1b;
+  --field: #171a1f;
+  --line: #2b3038;
+  --line-strong: #3d444f;
+  --band: #1e2228;
+  --band-2: #262b33;
+  --band-line: #3d444f;
+  --band-ink: #ecedef;
+  --band-muted: #a8b0b9;
+  --card-muted: #aeb5be;
+  --focus: var(--accent);
 }
 
 *,

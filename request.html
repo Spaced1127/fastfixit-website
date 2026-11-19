@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-US">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Start a repair | FastFixIt Electronics</title>
-  <meta name="description" content="Send a repair request for a game console, controller, handheld, computer, phone or audio device. We reply within one business day with the next step.">
-  <meta name="theme-color" content="#e8e8e3">
+  <title>Start a repair | Free diagnosis | FastFixIt Electronics</title>
+  <meta name="description" content="Send a repair request for a console, controller, handheld, computer, phone or audio device. Free diagnosis, drop-off or mail-in, and a 90-day warranty on every repair.">
+  <meta name="theme-color" content="#f4f1ea">
   <meta property="og:title" content="Start a repair | FastFixIt Electronics">
-  <meta property="og:description" content="Send a repair request for a game console, controller, handheld, computer, phone or audio device. We reply within one business day with the next step.">
+  <meta property="og:description" content="Send a repair request for a console, controller, handheld, computer, phone or audio device. Free diagnosis, drop-off or mail-in, and a 90-day warranty on every repair.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="FastFixIt Electronics">
   <meta name="twitter:card" content="summary">
@@ -16,6 +16,7 @@
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/css/theme-v2.css">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -32,12 +33,17 @@
       </a>
       <nav class="nav" id="site-nav" aria-label="Primary">
         <a href="services.html">Services</a>
+        <a href="mail-in.html">Mail-in</a>
         <a href="index.html#process">How it works</a>
         <a href="about.html">About</a>
         <a href="index.html#faq">FAQ</a>
         <a class="nav-cta" href="request.html">Start a repair</a>
       </nav>
       <div class="header-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Toggle dark mode">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
         <a class="btn btn--sm" href="request.html">Start a repair</a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>Menu</button>
       </div>
@@ -48,14 +54,15 @@
     <div class="shell page-head">
       <div>
         <h1>Start a repair.</h1>
-        <p class="lede">Tell us what the device is doing. If you have photos, add them; a clear picture of the port or the screen saves a day. We'll reply within one business day.</p>
+        <p class="lede">Tell us what the device is doing. Diagnosis is free, and every repair includes a 90-day warranty. Drop it off or mail it in; we'll reply within one business day.</p>
       </div>
       <aside class="page-aside">
         <h2>Before you send it</h2>
         <ul>
           <li>Back up anything you can't lose, if the device still powers on.</li>
           <li>Find the model number on the label or the bottom of the device.</li>
-          <li>Don't post a swollen battery. Tell us and we'll arrange a safe drop-off.</li>
+          <li>Don't mail a swollen battery. Tell us and we'll arrange a safe drop-off.</li>
+          <li>Mail-in? Wait for our reply with the shipping address before you box it.</li>
         </ul>
       </aside>
     </div>
@@ -119,11 +126,73 @@
                 </div>
 
                 <div class="field">
-                  <span class="field-label" id="handoff-label">Drop-off or post?</span>
+                  <span class="field-label" id="handoff-label">Drop-off or mail-in?</span>
                   <div class="radio-row" role="radiogroup" aria-labelledby="handoff-label">
                     <label for="handoff-drop"><input type="radio" id="handoff-drop" name="handoff" value="Drop off" checked> Drop off</label>
-                    <label for="handoff-post"><input type="radio" id="handoff-post" name="handoff" value="Post it in"> Post it in</label>
+                    <label for="handoff-mail"><input type="radio" id="handoff-mail" name="handoff" value="Mail it in"> Mail it in</label>
                   </div>
+                </div>
+              </div>
+
+              <div class="mailin-fields" data-mailin-fields hidden>
+                <p class="form-section-note">Mail-in? We'll reply with the shipping address, packing instructions and your reference before you ship.</p>
+
+                <div class="field-row">
+                  <div class="field" data-field="returnStreet">
+                    <label for="returnStreet">Return street address</label>
+                    <input id="returnStreet" name="returnStreet" type="text" autocomplete="street-address">
+                    <p class="field-error" id="returnStreet-error" hidden></p>
+                  </div>
+                  <div class="field" data-field="returnCity">
+                    <label for="returnCity">City</label>
+                    <input id="returnCity" name="returnCity" type="text" autocomplete="address-level2">
+                    <p class="field-error" id="returnCity-error" hidden></p>
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <div class="field" data-field="returnState">
+                    <label for="returnState">State</label>
+                    <input id="returnState" name="returnState" type="text" autocomplete="address-level1" maxlength="2" placeholder="TX">
+                    <p class="field-error" id="returnState-error" hidden></p>
+                  </div>
+                  <div class="field" data-field="returnZip">
+                    <label for="returnZip">ZIP code</label>
+                    <input id="returnZip" name="returnZip" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="10" placeholder="78701">
+                    <p class="field-error" id="returnZip-error" hidden></p>
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <div class="field">
+                    <label for="shippingCarrier">Carrier <span class="muted">(optional)</span></label>
+                    <select id="shippingCarrier" name="shippingCarrier">
+                      <option value="">Not shipped yet</option>
+                      <option value="USPS">USPS</option>
+                      <option value="UPS">UPS</option>
+                      <option value="FedEx">FedEx</option>
+                      <option value="DHL">DHL</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="trackingNumber">Tracking number <span class="muted">(optional)</span></label>
+                    <input id="trackingNumber" name="trackingNumber" type="text" autocomplete="off">
+                    <p class="hint">You can add this after you ship.</p>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="accessories">What's coming with it? <span class="muted">(optional)</span></label>
+                  <input id="accessories" name="accessories" type="text" placeholder="Charger, cable, controller, SD card">
+                </div>
+
+                <div class="field" data-field="packingAck">
+                  <div class="check-row">
+                    <input id="packingAck" name="packingAck" type="checkbox">
+                    <label for="packingAck">I'll pack it securely and put the reference inside the box.</label>
+                  </div>
+                  <p class="field-error" id="packingAck-error" hidden></p>
                 </div>
               </div>
             </fieldset>
@@ -245,6 +314,10 @@
             <h2>Request received.</h2>
             <p class="reference">Reference <span data-success-ref>—</span></p>
             <p>We'll reply to <strong data-success-email>—</strong> within one business day. If you have more photos, reply to the confirmation email and attach them there.</p>
+            <div data-success-mailin hidden>
+              <p>We'll send the shipping address and packing instructions in that reply. Don't ship until you have your reference and the address.</p>
+            </div>
+            <p>Every repair includes a 90-day warranty.</p>
             <p>Device: <span data-success-device>—</span></p>
             <a class="btn" href="index.html">Back to the shop</a>
           </div>
@@ -255,16 +328,16 @@
             <h2>What happens next</h2>
             <ol>
               <li>We read the request and reply within one business day.</li>
-              <li>Bench diagnosis, usually 24–48 hours.</li>
+              <li>Free bench diagnosis, usually 24–48 hours.</li>
               <li>You get a written quote. Nothing happens until you approve it.</li>
-              <li>Repair, then a 24-hour test before it goes home.</li>
-              <li>Collect in person, or we post it back with tracking.</li>
+              <li>Repair, then a 24-hour test. Every repair leaves with a 90-day warranty.</li>
+              <li>Collect in person, or we ship it back with tracking.</li>
             </ol>
           </div>
 
           <div class="aside-fee" data-reveal>
-            <h2>Bench diagnostic <span data-diagnostic>$45</span></h2>
-            <p>Credited toward the repair if you approve the quote. If we can't find the fault, you pay the bench fee only and get a written explanation.</p>
+            <h2>Free diagnosis.</h2>
+            <p>No bench fee. You get a written quote before any work, and every repair includes a 90-day warranty. If we can't find the fault, you still get a written explanation.</p>
           </div>
 
           <p class="aside-contact" data-reveal>
@@ -323,6 +396,7 @@
           <h3>Shop</h3>
           <ul>
             <li><a href="index.html#process">How it works</a></li>
+            <li><a href="mail-in.html">Mail-in repairs</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="index.html#faq">FAQ</a></li>
             <li><a href="request.html">Start a repair</a></li>

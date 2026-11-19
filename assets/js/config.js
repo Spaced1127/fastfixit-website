@@ -28,11 +28,11 @@ window.FFI_CONFIG = {
   // The deployed Cloudflare Worker endpoint, e.g.
   //   "https://api.fastfixit.com/repair-request"
   // Leave empty to make the form fall back to the visitor's email app.
-  formEndpoint: "",
+  formEndpoint: "https://api.fastfixitelectronics.com/repair-request",
 
   // Cloudflare Turnstile site key (public). Leave empty to hide the widget.
-  turnstileSiteKey: "",
+  turnstileSiteKey: "0x4AAAAAAGIeVmCJ8hgSB8JN",
 
   // Canonical site URL, e.g. "https://fastfixit.com". Used for structured data.
-  siteUrl: ""
+  siteUrl: "https://fastfixitelectronics.com"
 };

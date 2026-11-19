@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Request inbox | FastFixIt Electronics</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f4f1ea">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/css/theme-v2.css">
+  <script src="assets/js/boot.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <main class="admin-wrap" id="main">
+    <header class="admin-top">
+      <a class="admin-brand" href="index.html" aria-label="FastFixIt Electronics home">
+        <img src="assets/brand/badge-96.png" width="40" height="40" alt="">
+        <span>
+          <strong>FastFixIt</strong>
+          <span>Request inbox</span>
+        </span>
+      </a>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Toggle dark mode">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <a class="btn btn--sm" href="index.html">Public site</a>
+      </div>
+    </header>
+
+    <div class="admin-head">
+      <h1>Repair requests.</h1>
+      <p>Every website request, newest first. Mail-in requests include the return address and shipping details. This page is not linked from the public site.</p>
+    </div>
+
+    <div class="admin-alert" data-admin-alert hidden role="alert" tabindex="-1"></div>
+
+    <form class="admin-token-card" data-token-form>
+      <div class="field">
+        <label for="admin-token">Admin token</label>
+        <input id="admin-token" type="password" autocomplete="off" required placeholder="Paste the ADMIN_TOKEN value">
+        <p class="admin-token-note">Set on the Worker with <code>npx wrangler secret put ADMIN_TOKEN</code>. It stays in this browser tab and is cleared when the tab closes.</p>
+      </div>
+      <div class="form-submit">
+        <button class="btn" type="submit">Open inbox</button>
+      </div>
+    </form>
+
+    <div class="admin-actions" data-admin-actions hidden>
+      <button class="btn btn--sm" type="button" data-admin-refresh>Refresh</button>
+      <button class="btn btn--sm" type="button" data-admin-signout>Sign out</button>
+    </div>
+
+    <div class="admin-empty" data-admin-empty hidden>No requests yet.</div>
+    <div class="admin-list" data-admin-list></div>
+  </main>
+
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/site.js" defer></script>
+  <script src="assets/js/admin.js" defer></script>
+</body>
+</html>

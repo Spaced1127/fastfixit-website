@@ -1,13 +1,14 @@
 /* ------------------------------------------------------------------
    Bench estimate data
    ------------------------------------------------------------------
-   `from` is a starting labour price in whole dollars. Change these
+   `from` is a starting labor price in whole dollars. Change these
    to your own numbers before launch. Every figure on the site is
    presented as a starting point, confirmed by a written quote.
    ------------------------------------------------------------------ */
 
 window.FFI_DATA = {
-  diagnostic: 45,
+  // 0 renders as "Free" everywhere the diagnosis is mentioned.
+  diagnostic: 0,
 
   devices: [
     {
@@ -134,7 +135,7 @@ window.FFI_DATA = {
           id: "screen",
           label: "Cracked or dead screen",
           category: "screen",
-          check: "Panel, digitizer and the ribbon connector. We test touch, brightness and colour after.",
+          check: "Panel, digitizer and the ribbon connector. We test touch, brightness and color after.",
           time: "2–4 days",
           from: 95
         },

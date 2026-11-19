@@ -2,9 +2,11 @@
 # .dev.vars is ignored by git. Never commit real keys.
 
 RESEND_API_KEY = "re_test_replace_me"
-TO_EMAIL = "repairs@YOUR-DOMAIN.com"
-FROM_EMAIL = "FastFixIt Repairs <repairs@YOUR-DOMAIN.com>"
-SITE_ORIGIN = "http://localhost:3000,https://YOUR-DOMAIN.com"
+TO_EMAIL = "repairs@fastfixitelectronics.com"
+FROM_EMAIL = "FastFixIt Repairs <repairs@send.fastfixitelectronics.com>"
+SHOP_ADDRESS = "FastFixIt Electronics, [STREET ADDRESS], [CITY, STATE ZIP]"
+SITE_ORIGIN = "http://localhost:3000,https://fastfixitelectronics.com"
+ADMIN_TOKEN = "replace-with-a-long-random-admin-token"
 
 # Optional: set this to test the spam check locally. Leave empty to skip it.
 TURNSTILE_SECRET = ""

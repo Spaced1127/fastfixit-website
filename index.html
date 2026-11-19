@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-US">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FastFixIt Electronics | Console &amp; electronics repair</title>
-  <meta name="description" content="Independent board-level repair for game consoles, controllers, handhelds, laptops, phones and audio gear. Diagnosed in-house, quoted before work starts.">
-  <meta name="theme-color" content="#e8e8e3">
-  <meta property="og:title" content="FastFixIt Electronics | Console &amp; electronics repair">
-  <meta property="og:description" content="Independent board-level repair for game consoles, controllers, handhelds, laptops, phones and audio gear. Diagnosed in-house, quoted before work starts.">
+  <title>FastFixIt Electronics | Free diagnosis &amp; 90-day repair warranty</title>
+  <meta name="description" content="Independent board-level repair for game consoles, controllers, handhelds, laptops, phones and audio gear. Free diagnosis, a written quote and a 90-day warranty on every repair.">
+  <meta name="theme-color" content="#f4f1ea">
+  <meta property="og:title" content="FastFixIt Electronics | Free diagnosis &amp; 90-day repair warranty">
+  <meta property="og:description" content="Independent board-level repair for consoles, controllers, handhelds, computers and audio gear. Free diagnosis, a written quote and a 90-day warranty on every repair.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="FastFixIt Electronics">
   <meta name="twitter:card" content="summary">
@@ -17,6 +17,7 @@
   <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" as="image" href="assets/img/bench-solder.webp" imagesrcset="assets/img/bench-solder-sm.webp 800w, assets/img/bench-solder.webp 1200w" imagesizes="(max-width: 900px) 90vw, 40vw" fetchpriority="high">
   <link rel="stylesheet" href="assets/css/site.css">
+  <link rel="stylesheet" href="assets/css/theme-v2.css">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -33,12 +34,17 @@
       </a>
       <nav class="nav" id="site-nav" aria-label="Primary">
         <a href="services.html">Services</a>
+        <a href="mail-in.html">Mail-in</a>
         <a href="index.html#process">How it works</a>
         <a href="about.html">About</a>
         <a href="index.html#faq">FAQ</a>
         <a class="nav-cta" href="request.html">Start a repair</a>
       </nav>
       <div class="header-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Toggle dark mode">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
         <a class="btn btn--sm" href="request.html">Start a repair</a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>Menu</button>
       </div>
@@ -50,15 +56,15 @@
       <div class="shell hero-grid">
         <div class="hero-copy">
           <h1>Board-level repair,<br>no guesswork.</h1>
-          <p class="hero-lede">Consoles, controllers, handhelds, laptops and audio gear, repaired in-house at our bench in <span data-contact="city">[CITY]</span>. You get a written quote before we touch a screwdriver.</p>
+          <p class="hero-lede">Consoles, controllers, handhelds, laptops and audio gear, repaired in-house at our bench in <span data-contact="city">[CITY]</span>. Free diagnosis, then a written quote before we touch a screwdriver.</p>
           <div class="hero-actions">
             <a class="btn" href="request.html">Start a repair</a>
             <a class="text-link" href="#services">See what we fix <span aria-hidden="true">→</span></a>
           </div>
           <ul class="hero-facts">
-            <li>24–48 hour diagnosis</li>
+            <li>Free diagnosis</li>
             <li>Written quote before work</li>
-            <li>90-day workmanship warranty</li>
+            <li>90-day warranty on every repair</li>
           </ul>
         </div>
 
@@ -73,11 +79,25 @@
       </div>
     </section>
 
+    <div class="promise-band" role="region" aria-label="Our promise">
+      <div class="shell promise-grid">
+        <div>
+          <p class="promise-value">Free diagnosis.</p>
+          <p class="promise-note">No bench fee. No obligation.</p>
+        </div>
+        <div>
+          <p class="promise-value">90-day warranty.</p>
+          <p class="promise-note">On every repair we do, in writing.</p>
+        </div>
+        <p class="promise-aside">Written quote before any work.</p>
+      </div>
+    </div>
+
     <section class="section section--surface" id="estimate">
       <div class="shell">
         <div class="section-head">
           <h2>Start with the symptom.</h2>
-          <p class="lede">Pick the device and the fault. You'll see what we'd check, how long it usually takes and where the labour starts. No account, no obligation.</p>
+          <p class="lede">Pick the device and the fault. You'll see what we'd check, how long it usually takes and where the labor starts. No account, no obligation.</p>
         </div>
 
         <div class="estimator" data-estimator>
@@ -91,7 +111,7 @@
               <div class="chips" data-fault-chips></div>
               <p class="estimator-hint" data-fault-hint>Choose the closest symptom.</p>
             </fieldset>
-            <p class="estimator-note">This is a bench estimate, not a diagnosis. The written quote comes after we've tested the device. Starting prices are labour only; parts and tax are confirmed before work starts.</p>
+            <p class="estimator-note">This is a bench estimate, not a diagnosis. The written quote comes after we've tested the device. Starting prices are labor only; parts and tax are confirmed before work starts.</p>
           </div>
 
           <aside class="ticket" aria-label="Bench estimate">
@@ -117,12 +137,12 @@
                 <span class="ticket__value" data-ticket-time>—</span>
               </div>
               <div class="ticket__row ticket__row--price">
-                <span class="ticket__label">Labour from</span>
+                <span class="ticket__label">Labor from</span>
                 <span class="ticket__value" data-ticket-price>—</span>
               </div>
             </div>
             <a class="ticket__cta" href="request.html#request-form" data-ticket-cta>Start a repair</a>
-            <p class="ticket__fine">Bench diagnostic <span data-diagnostic>$45</span>, credited toward the repair if you approve the quote. You'll get a written quote before any work.</p>
+            <p class="ticket__fine">Diagnosis is free. You'll get a written quote before any work. Every repair includes a 90-day warranty.</p>
           </aside>
         </div>
         <noscript>
@@ -198,7 +218,7 @@
         <div class="process-copy" data-reveal>
           <h2>A repair you can follow.</h2>
           <p class="lede">You'll know where your device is and what it costs at every step. If a part is back-ordered, we tell you the day we know, not the day it was supposed to arrive.</p>
-          <p class="small">Times are typical for in-stock parts. We confirm the schedule before ordering anything.</p>
+          <p class="small">Times are typical for in-stock parts. We confirm the schedule before ordering anything. Not local? <a class="text-link" href="mail-in.html">Mail it in</a>.</p>
         </div>
 
         <div class="slip" data-reveal>
@@ -207,11 +227,11 @@
             <span>Time at the bench</span>
           </div>
           <div class="slip__row">
-            <span class="slip__name">Drop off or post in</span>
+            <span class="slip__name">Drop off or mail in</span>
             <span class="slip__time">Same day</span>
           </div>
           <div class="slip__row">
-            <span class="slip__name">Bench diagnosis</span>
+            <span class="slip__name">Free bench diagnosis</span>
             <span class="slip__time">24–48 hours</span>
           </div>
           <div class="slip__row">
@@ -228,7 +248,7 @@
           </div>
           <div class="slip__foot">
             <span>Written quote before work</span>
-            <span>No surprises</span>
+            <span>90-day warranty</span>
           </div>
         </div>
       </div>
@@ -248,14 +268,15 @@
               <figcaption>The fault is found by measurement, not by swapping parts until the symptom moves.</figcaption>
             </figure>
             <div class="warranty">
-              <h3>90 days on our work.</h3>
-              <p>If our repair fails within 90 days, bring it back and we'll make it right. Parts carry the manufacturer's or supplier's warranty. Damage after the repair isn't covered.</p>
+              <h3>90 days. Every repair.</h3>
+              <p>Everything we repair leaves with a 90-day workmanship warranty in writing. If our work fails within 90 days, bring it back and we'll make it right. Parts carry the manufacturer's or supplier's warranty. Damage after the repair isn't covered.</p>
               <a class="text-link" href="about.html#standards">How we work</a>
             </div>
           </div>
 
           <div data-reveal>
-            <table class="test-table">
+            <div class="table-card">
+              <table class="test-table">
               <thead>
                 <tr>
                   <th scope="col">Test</th>
@@ -289,6 +310,7 @@
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </div>
@@ -329,16 +351,16 @@
           <h2>Straight answers.</h2>
         </div>
         <div class="faq-cols" data-reveal>
-          <p><strong>Do you charge to look at it?</strong> Yes. <span data-diagnostic>$45</span> for the bench diagnosis. It comes off the bill if you approve the repair. If we can't find the fault, you pay the bench fee only and get a written explanation.</p>
+          <p><strong>Do you charge to look at it?</strong> No. Diagnosis is free. If we can't find the fault, you still get a written explanation, and there's no bench fee.</p>
           <p><strong>How fast is fast?</strong> Diagnosis is usually 24–48 hours after drop-off. Most repairs are 2–5 business days after approval. Parts can add time; we tell you the day we know.</p>
           <p><strong>Do you use genuine parts?</strong> Genuine where they're available and make sense. Where they aren't, we use matched-spec parts and tell you which. The part number goes on your invoice.</p>
           <p><strong>Will I lose my data?</strong> Most hardware repairs don't touch storage. Back up anything you can't lose before you drop off. We never ask for your account passwords; if a test needs a login, you type it in.</p>
           <p><strong>Can you fix liquid damage?</strong> We assess it, clean the corrosion and repair what the current damaged. We won't promise a result before we see it. Liquid travels, and corrosion can hide under shields.</p>
           <p><strong>Do you work on modded consoles?</strong> Hardware repairs, yes. We don't install or support pirated software.</p>
-          <p><strong>Do you fix HDMI ports?</strong> Yes. PS5 and Xbox HDMI ports are a common job. We replace them at board level under a microscope and test every output afterwards.</p>
-          <p><strong>Do you ship?</strong> Yes, you can post a device in. Pack it well, include a note with your contact details, and we'll confirm the return shipping cost before we send it back.</p>
-          <p><strong>What if it can't be fixed?</strong> You get a straight diagnosis and the device back. You pay the bench fee only, no repair charge. We'll tell you if a part is unavailable or the board is beyond economical repair.</p>
-          <p><strong>What warranty do you give?</strong> 90 days on our workmanship. Parts carry the manufacturer's or supplier's warranty. Physical damage after the repair isn't covered.</p>
+          <p><strong>Do you fix HDMI ports?</strong> Yes. PS5 and Xbox HDMI ports are a common job. We replace them at board level under a microscope and test every output afterward.</p>
+          <p><strong>Do you ship?</strong> Yes, you can <a class="text-link" href="mail-in.html">mail a device in</a>. Pack it well, include a note with your reference and contact details, and we'll confirm the return shipping cost before we send it back.</p>
+          <p><strong>What if it can't be fixed?</strong> You get a straight diagnosis and the device back. Diagnosis is free, so there's no repair charge. We'll tell you if a part is unavailable or the board is beyond economical repair.</p>
+          <p><strong>What warranty do you give?</strong> Every repair includes 90 days on our workmanship. Parts carry the manufacturer's or supplier's warranty. Physical damage after the repair isn't covered.</p>
         </div>
       </div>
     </section>
@@ -398,6 +420,7 @@
           <h3>Shop</h3>
           <ul>
             <li><a href="index.html#process">How it works</a></li>
+            <li><a href="mail-in.html">Mail-in repairs</a></li>
             <li><a href="about.html">About</a></li>
             <li><a href="index.html#faq">FAQ</a></li>
             <li><a href="request.html">Start a repair</a></li>

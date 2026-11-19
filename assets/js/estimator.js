@@ -98,7 +98,7 @@
       ticket.cta.href = "request.html?device=" + encodeURIComponent(device.id) + "&fault=" + encodeURIComponent(fault.id) + "#request-form";
       if (status) {
         status.textContent =
-          "Estimate updated: " + device.label + ", " + fault.label + ". Labour from " +
+          "Estimate updated: " + device.label + ", " + fault.label + ". Labor from " +
           (fault.from == null ? "a quoted inspection" : "$" + fault.from + " plus parts") +
           ". Typical bench time " + fault.time + " after approval.";
       }

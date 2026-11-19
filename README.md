@@ -1,6 +1,10 @@
 # FastFixIt Electronics
 
-A static website for FastFixIt Electronics, LLC: game console and electronics repair. It is built to be hosted on **GitHub Pages**, with the domain served by **Cloudflare** and the repair request form handled by a small **Cloudflare Worker** that sends email through **Resend**.
+A static website for FastFixIt Electronics, LLC: game console and electronics repair. Hosted on **GitHub Pages**, with **Cloudflare** for DNS and the repair intake API, and **Resend** for email notifications.
+
+**Repository:** <https://github.com/Spaced1127/fastfixit-website>  
+**Preview:** <https://spaced1127.github.io/fastfixit-website/>  
+**Target domain:** <https://fastfixitelectronics.com>
 
 No build step. Upload the files and the site runs.
 
@@ -10,20 +14,20 @@ No build step. Upload the files and the site runs.
 
 | Page | File | What it does |
 | --- | --- | --- |
-| Home | `index.html` | Hero, live bench estimate, services index, process, test standards, shop, FAQ, contact |
+| Home | `index.html` | Hero, free-diagnosis/90-day promise band, live bench estimate, services, process, test standards, shop, FAQ, contact |
 | Services | `services.html` | Rate card, console / controller / computer / board-level detail, scope, warranty |
-| About | `about.html` | The shop, how it works, equipment, photographs |
-| Start a repair | `request.html` | The repair intake form with validation, photo attachments and a success state |
-| Privacy | `privacy.html` | Plain-language privacy note for the form |
+| Mail-in | `mail-in.html` | Mail-in process, packing list, shipping and returns, mail-in request CTA |
+| About | `about.html` | The shop, how we work, equipment, photographs |
+| Start a repair | `request.html` | Intake form for drop-off or mail-in, photo attachments, success state |
+| Request inbox | `admin.html` | Private, token-gated list of website requests and status updates (noindex, not linked publicly) |
+| Privacy | `privacy.html` | Plain-language privacy note |
 | 404 | `404.html` | Not-found page |
 
-The design direction is **the work order**: warm newsprint, ink and brass, one typeface, document-like tables and a printed process slip. No stock icons, no gradients, no invented reviews.
+The visual system is based on **Repair Bench V2**: warm canvas `#f4f1ea`, white surfaces, ink `#17191c`, burnt-orange accent, Archivo type, 8/12px radii and flat tone-separated cards. It includes a light/dark toggle that follows the system theme by default and saves the choice in `ffi-theme`.
 
 ---
 
 ## Read this before publishing
-
-The site is finished, but it is addressed to **your** business. These are the things to replace or confirm.
 
 ### 1. Contact details and city
 
@@ -31,7 +35,7 @@ Edit **`assets/js/config.js`**. Every page reads from it.
 
 ```js
 phone: "(512) 555-0142",
-email: "repairs@fastfixit.com",
+email: "repairs@fastfixitelectronics.com",
 street: "123 Example Ave",
 city: "Austin",
 region: "TX",
@@ -39,66 +43,61 @@ postal: "78701",
 country: "US",
 hours: "Mon–Fri 10–6, Sat 10–2",
 mapUrl: "",
-formEndpoint: "https://api.fastfixit.com/repair-request",
+formEndpoint: "https://api.fastfixitelectronics.com/repair-request",
 turnstileSiteKey: "",
-siteUrl: "https://fastfixit.com"
+siteUrl: "https://fastfixitelectronics.com"
 ```
 
-If a value is left empty, the page shows a bracket placeholder such as `[PHONE]` or `[CITY]`. Those are deliberate so nothing fake is published as real.
+Empty values show a clearly marked bracket placeholder such as `[PHONE]` or `[CITY]`. `mapUrl` adds a Directions link under the home-page address. `country` is used in structured data.
 
-`mapUrl` adds a small "Directions" link under the address on the home page. `country` is used in the structured data; change it if you are not in the US.
+### 2. Prices, diagnosis and warranty
 
-### 2. Prices and policies
+- **Diagnosis is free.** The estimator uses `diagnostic: 0` in `assets/js/data.js`; any place with `data-diagnostic` renders **Free**. There is no bench fee anywhere in the copy.
+- **Every repair includes a 90-day workmanship warranty.** This is stated on the home page, services page, about page, request page, FAQ and customer email.
+- **Starting prices** for the estimator live in `assets/js/data.js`. They are sample labor prices; change them.
+- The **rate card** on `services.html` is static HTML. Keep it in sync with `data.js`.
+- Confirm these sample promises: 24–48 hour diagnosis, 2–5 day typical repair, 24-hour soak test, written quote before work, one bench, local drop-off or mail-in. Edit the copy if any of that is not true.
+- The service lists are deliberately broad. Remove anything you do not take on (phones, TVs, turntables, mail-in), and confirm the equipment list on `about.html`.
 
-- **Starting prices** for the estimator live in **`assets/js/data.js`**. The `diagnostic` value and each fault's `from` value are sample numbers. Change them.
-- The **rate card** on `services.html` is static HTML. Keep it in sync with `data.js` before launch.
-- The service lists are deliberately broad. Remove anything you don't actually take on (phones, TVs, turntables, mail-in), and confirm the equipment list on `about.html` matches your bench.
-- The following promises are also static and should be confirmed by you:
-  - 24–48 hour diagnosis
-  - 2–5 day typical repair
-  - 90-day workmanship warranty
-  - $45 bench diagnostic, credited on approval
-  - 24-hour soak test
-  - "written quote before work"
-  - one bench, one technician
-  - local drop-off or post
-- If a number changes, search the HTML for it. `$45` is rendered from `data.js` wherever `<span data-diagnostic>` appears.
+### 3. Mail-in
 
-### 3. Photographs
+The request form has a **Drop off / Mail it in** choice. Mail-in adds return address, carrier, tracking number, accessories and a packing confirmation. The API validates the return address and stores it with the request.
 
-The five photographs in `assets/img/` are **AI-generated placeholders**, not photographs of your shop. Replace them with real photos of your bench, your tools and your work as soon as you can. The design will only get stronger.
+The site does **not** publish a shipping label. After a mail-in request, the shop replies with the bench address and packing instructions. Set that address on the Worker as `SHOP_ADDRESS`; the customer auto-reply includes it when present.
 
-Recommended replacements:
+Return shipping is quoted before the device goes back. The customer pays inbound shipping. Confirm both policies.
+
+### 4. Photographs
+
+The five photographs in `assets/img/` are **AI-generated placeholders**, not photographs of your shop. Replace them with real photos of your bench, tools and work. Keep the same paths and aspect ratios:
 
 | File | Crop | Use |
 | --- | --- | --- |
 | `bench-solder.webp` | 4:5 | Hero crossfade |
-| `bench-hdmi.webp` | 4:5 | Hero crossfade, services |
-| `bench-stick.webp` | 4:5 | Hero crossfade, services, about |
-| `bench-wide.webp` | 3:2 | Home shop section, About |
-| `bench-test.webp` | 3:2 | Standards, services, About |
+| `bench-hdmi.webp` | 4:5 | Hero crossfade, services, about, mail-in |
+| `bench-stick.webp` | 4:5 | Hero crossfade, services, about, mail-in |
+| `bench-wide.webp` | 3:2 | Home shop section, About, Mail-in |
+| `bench-test.webp` | 3:2 | Standards, services, About, Mail-in |
 
-Keep the `-sm.webp` versions for phones, or regenerate them. The generated placeholders exist only as WebP; replace them with your own photos at the same paths. Update the `alt` text when you change a photo.
+Keep the `-sm.webp` versions for phones. Update the `alt` text when you change a photo.
 
-### 4. Privacy note
+### 5. Privacy note
 
-`privacy.html` describes the form as built (email through Cloudflare and Resend, no analytics). Read it, adjust the retention period and the shop details, and have it checked if you want legal certainty. It is not legal advice.
+`privacy.html` describes the form as built: Cloudflare storage and spam check, Resend email, a private token-gated inbox, no advertising trackers. Read it, adjust the retention period and shop details, and have it checked if you want legal certainty. It is not legal advice.
 
-### 5. Reviews
+### 6. Reviews
 
-There are no testimonials, star ratings, customer logos or invented statistics on this site. If you want social proof, add real Google reviews or a link to your listing. Do not fill the gap with made-up quotes.
+There are no testimonials, star ratings, customer logos or invented statistics on this site. Add real Google reviews or a link to your listing if you want social proof. Do not fill the gap with made-up quotes.
 
 ---
 
 ## Run it locally
 
-Any static server works. From this folder:
-
 ```powershell
 npx serve .
 ```
 
-Or, with Python:
+Or:
 
 ```powershell
 python -m http.server 3000
@@ -106,55 +105,31 @@ python -m http.server 3000
 
 Open `http://localhost:3000`.
 
-Without a form endpoint configured, the form falls back to opening the visitor's email app, as long as the shop email is filled in `assets/js/config.js`. To test the real form, run the Worker locally (below) and set:
-
-```js
-formEndpoint: "http://localhost:8787/repair-request"
-```
-
-The page can also be opened directly from disk, but the form's relative paths and email fallback behave better through a server.
+Without a form endpoint configured, the form falls back to opening the visitor's email app, as long as the shop email is in `config.js`. To test the real Worker locally, see the Worker section.
 
 ---
 
 ## Deploy the site to GitHub Pages
 
-### 1. Create the repository
-
-Create a new repository at <https://github.com/new>. Name it `fastfixit-website` (or anything you like). Do not add a README, `.gitignore` or licence; this folder already has them.
-
-This folder is already a git repository with an initial commit on `main`. Add the remote and push:
+The repository already exists and `main` tracks `origin/main`. Push changes:
 
 ```powershell
-git remote add origin https://github.com/YOUR-USERNAME/fastfixit-website.git
-git push -u origin main
-```
-
-If you copied only the site files and do not have the `.git` folder, initialise first:
-
-```powershell
-git init -b main
 git add .
-git commit -m "FastFixIt website"
-git remote add origin https://github.com/YOUR-USERNAME/fastfixit-website.git
-git push -u origin main
+git commit -m "Update site"
+git push
 ```
 
-### 2. Turn on Pages
+**Settings → Pages** should be:
 
-In the repository: **Settings → Pages**
+- Source: Deploy from a branch
+- Branch: `main`
+- Folder: `/ (root)`
 
-- **Source:** Deploy from a branch
-- **Branch:** `main`
-- **Folder:** `/ (root)`
-- Save
+The preview is <https://spaced1127.github.io/fastfixit-website/>. The target custom domain is `fastfixitelectronics.com`.
 
-GitHub gives you a `https://YOUR-USERNAME.github.io/fastfixit-website/` preview in a minute or two.
+### Cloudflare DNS for GitHub Pages
 
-### 3. Connect the domain in Cloudflare
-
-In the repository: **Settings → Pages → Custom domain**, enter your apex domain (for example `fastfixit.com`) and save. GitHub will create a `CNAME` file in the repo and check DNS.
-
-In the **Cloudflare dashboard → your domain → DNS**, create:
+In **Cloudflare → fastfixitelectronics.com → DNS → Records**, set:
 
 | Type | Name | Content | Proxy |
 | --- | --- | --- | --- |
@@ -166,119 +141,147 @@ In the **Cloudflare dashboard → your domain → DNS**, create:
 | AAAA | `@` | `2606:50c0:8001::153` | DNS only |
 | AAAA | `@` | `2606:50c0:8002::153` | DNS only |
 | AAAA | `@` | `2606:50c0:8003::153` | DNS only |
-| CNAME | `www` | `YOUR-USERNAME.github.io` | DNS only |
+| CNAME | `www` | `spaced1127.github.io` | DNS only |
 
-Remove any old `A`, `AAAA` or `CNAME` records for `@` and `www` first.
+Remove the old proxied apex/www records first. **Do not touch the MX or TXT records**; email is hosted at IONOS. Do not touch the tracker subdomain unless you are moving it.
 
-Leave the proxy status on **DNS only** (grey cloud) while GitHub issues the certificate. It is the reliable path. Once the certificate is active and **Enforce HTTPS** is available, turn that on in GitHub Pages. If you later want Cloudflare's proxy, set SSL/TLS mode to **Full (strict)** and test; some GitHub Pages + proxy combinations are more trouble than they are worth for a five-page site.
+After DNS resolves, set **Settings → Pages → Custom domain** to `fastfixitelectronics.com` and wait for the certificate. Turn on **Enforce HTTPS**. Add a `CNAME` file containing `fastfixitelectronics.com` if GitHub does not create it. The `CNAME.example` file shows the format.
 
-Do not edit the `CNAME` file by hand in normal use. GitHub manages it when you set the custom domain. If you prefer to start from the template, copy `CNAME.example` to `CNAME` and replace the domain.
+Keep the proxy off (gray cloud) while GitHub issues the certificate. If you later put Cloudflare in front, use SSL/TLS **Full (strict)**.
 
-The initial certificate can take up to 24 hours. If GitHub reports a DNS error, re-check that the records are unproxied and that `www` points at `YOUR-USERNAME.github.io`, not at the repository path.
+The custom `404.html` is served on the custom domain. On the `github.io` project preview, GitHub may show its own bare 404; the page is still at `/404.html`.
 
 ---
 
-## Deploy the repair form Worker
+## Deploy the Worker, D1 inbox and spam check
 
-GitHub Pages cannot receive a POST. The form sends JSON to a Cloudflare Worker. The Worker verifies the spam token, validates the request, emails the shop through Resend, and sends the customer a confirmation. It is on the free Workers plan for this volume.
+The Worker in `worker/` handles:
 
-### 1. Verify a sending domain in Resend
+- `POST /repair-request` — drop-off or mail-in intake
+- `GET /admin/requests` — protected request list
+- `PATCH /admin/requests/:reference` — protected status update
+- `GET /health`
 
-1. Create an account at <https://resend.com>.
-2. **Domains → Add domain**, enter your domain, and add the DNS records Resend shows (DKIM and SPF). If Cloudflare is your DNS host, these are normal TXT/MX records; keep them **DNS only**.
-3. Wait for **Verified**.
-4. **API Keys → Create API key**, sending access only. Copy it once.
+It stores every request in **Cloudflare D1** and can send email through **Resend**. If Resend is not configured, requests are still stored and visible in the inbox. If D1 is not configured, email still works.
 
-The `FROM_EMAIL` in the Worker must be on the verified domain. `TO_EMAIL` can be any inbox you read, including a Gmail address.
-
-### 2. Configure and deploy
+### 1. Create the D1 database
 
 ```powershell
 cd worker
-npx wrangler login
-npx wrangler deploy
+npx wrangler d1 create fastfixit-requests
 ```
 
-Set the real values in `worker/wrangler.toml` first:
-
-```toml
-[vars]
-SITE_ORIGIN = "https://YOUR-DOMAIN.com,https://www.YOUR-DOMAIN.com"
-TO_EMAIL = "repairs@YOUR-DOMAIN.com"
-FROM_EMAIL = "FastFixIt Repairs <repairs@YOUR-DOMAIN.com>"
-```
-
-`SITE_ORIGIN` is the exact origin the browser sends: scheme + host, no path, no trailing slash. Include `www` if you use it. For local testing, include `http://localhost:3000`.
-
-Add the two secrets:
+Copy the `database_id` into `worker/wrangler.toml`, uncomment the `[[d1_databases]]` block, and apply the schema:
 
 ```powershell
+npx wrangler d1 execute fastfixit-requests --remote --file=schema.sql
+```
+
+### 2. Set the Worker variables
+
+In `worker/wrangler.toml`:
+
+```toml
+SITE_ORIGIN = "https://fastfixitelectronics.com,https://www.fastfixitelectronics.com,https://spaced1127.github.io,http://localhost:3000"
+TO_EMAIL = "repairs@fastfixitelectronics.com"
+FROM_EMAIL = "FastFixIt Repairs <repairs@send.fastfixitelectronics.com>"
+SHOP_ADDRESS = "FastFixIt Electronics, 123 Example Ave, Austin, TX 78701"
+```
+
+`SITE_ORIGIN` must match the browser origin exactly: scheme + host, no path, no trailing slash.
+
+### 3. Set secrets
+
+```powershell
+npx wrangler secret put ADMIN_TOKEN
 npx wrangler secret put RESEND_API_KEY
 npx wrangler secret put TURNSTILE_SECRET
 ```
 
-The first deploy gives you a `https://fastfixit-repairs.YOUR-SUBDOMAIN.workers.dev` URL. You can use that as the form endpoint while testing.
+`ADMIN_TOKEN` is a long random string used by `admin.html`. The site owner should keep it out of the repository and rotate it if it is shared. `RESEND_API_KEY` and `TURNSTILE_SECRET` can be left unset while you bring the rest up.
 
-### 3. Add a custom domain for the Worker
+### 4. Deploy and attach the API domain
 
-In **Cloudflare dashboard → Workers & Pages → fastfixit-repairs → Settings → Domains & Routes → Add custom domain**, enter `api.YOUR-DOMAIN.com`.
-
-That creates a proxied DNS record. Do not point the site domain at the Worker; only `api` needs it.
-
-Alternatively, uncomment the `[[routes]]` block in `wrangler.toml` and redeploy.
-
-### 4. Point the site at the Worker
-
-In `assets/js/config.js`:
-
-```js
-formEndpoint: "https://api.YOUR-DOMAIN.com/repair-request"
+```powershell
+npx wrangler deploy
 ```
 
-Also set `turnstileSiteKey` (below). Commit and push.
+Then either add `api.fastfixitelectronics.com` in **Workers & Pages → fastfixit-repairs → Settings → Domains & Routes**, or uncomment the `[[routes]]` block in `wrangler.toml` and redeploy. The route is proxied through Cloudflare; leave the site apex on DNS only.
 
-### 5. Turnstile (spam protection)
+Set `formEndpoint` in `assets/js/config.js` to:
 
-1. **Cloudflare dashboard → Turnstile → Add site**.
-2. Add your domain. Widget mode: Managed.
-3. Copy the **site key** into `assets/js/config.js` as `turnstileSiteKey`.
-4. Copy the **secret key** into the Worker with `npx wrangler secret put TURNSTILE_SECRET`.
+```js
+formEndpoint: "https://api.fastfixitelectronics.com/repair-request"
+```
 
-The widget only appears when a site key is set. If the secret is set on the Worker, a missing token is rejected. Set both or neither.
+Commit and push.
 
-### 6. Test it
+### 5. Resend (optional email notifications)
 
-- Submit a request with a real email address and a real photo.
-- Confirm the shop inbox receives it with the photo attached.
-- Confirm the customer inbox receives the auto-reply; reply to that email to check it reaches the shop.
-- Submit with the spam field filled (use browser dev tools) and confirm nothing is sent.
-- Submit with a fast timer and confirm nothing is sent.
-- Check the reference number (`FF-YYMMDD-XXXX`) appears on both emails.
+Use a **sending subdomain**, such as `send.fastfixitelectronics.com`, so you do not disturb the IONOS MX/SPF records on the root domain.
 
-### 7. Optional rate limit
+1. In Resend, add `send.fastfixitelectronics.com` as a domain.
+2. Add the DNS records Resend shows. Keep them DNS only.
+3. Create a sending-only API key.
+4. Put the key in the Worker with `npx wrangler secret put RESEND_API_KEY`.
+5. Set `FROM_EMAIL` to an address on the verified subdomain.
 
-In **Cloudflare → Security → WAF → Rate limiting rules**, add a rule for host `api.YOUR-DOMAIN.com`, path `/repair-request`, 10 requests per minute per IP, block for 10 minutes. The free plan includes one rule. Turnstile is the primary protection; this is a second layer.
+Until Resend is configured, the form still stores requests and the request inbox is the notification. The customer sees the standard “we'll reply” message; reply from the inbox or your email.
+
+### 6. Turnstile
+
+Cloudflare Turnstile is optional but recommended. Add a Turnstile widget for `fastfixitelectronics.com` and `spaced1127.github.io`. Put the **site key** in `assets/js/config.js` as `turnstileSiteKey` and the **secret** in the Worker:
+
+```powershell
+npx wrangler secret put TURNSTILE_SECRET
+```
+
+Set both or neither. If the secret is set and the site key is missing, the form will fail.
+
+### 7. The request inbox
+
+Open:
+
+```text
+https://fastfixitelectronics.com/admin.html
+```
+
+Paste the `ADMIN_TOKEN` you set on the Worker. The token stays in that browser tab (sessionStorage) and is cleared when the tab closes. The inbox shows every request, including:
+
+- contact and preferred method
+- device, model, serial and fault
+- drop-off or mail-in
+- return address, carrier, tracking and accessories for mail-in
+- the estimate selection and submitted details
+- photos count
+- status, with a select and save button
+
+Statuses: New, Awaiting device, Received, Diagnosing, Quoted, Waiting on customer, Approved, Repairing, Testing, Ready, Shipped, Closed, Canceled.
+
+The page is `noindex` and is not linked from the public site. For a stronger lock, put **Cloudflare Access** in front of `/admin.html` and the `api` hostname, and keep the token as a second factor.
+
+### 8. Test it
+
+- Submit a drop-off request and check D1 / the inbox.
+- Submit a mail-in request with a return address and confirm the admin shows the address, carrier, tracking and accessories.
+- Change a status in the inbox and confirm the badge and row update.
+- If Resend is on: check the shop email and the customer auto-reply; reply to the auto-reply to verify it reaches the shop.
+- If Turnstile is on: complete the widget and confirm a missing token is rejected.
+- Try a mail-in request with no address and confirm it is rejected.
+- Try the honeypot and a fast submit; confirm nothing is stored or sent.
 
 ### Worker environment reference
 
 | Variable | Secret? | Purpose |
 | --- | --- | --- |
-| `RESEND_API_KEY` | yes | Sends both emails |
+| `RESEND_API_KEY` | yes | Sends shop and customer emails |
 | `TO_EMAIL` | no | Shop inbox (comma-separated allowed) |
-| `FROM_EMAIL` | no | Verified Resend sender |
+| `FROM_EMAIL` | no | Verified Resend sender on the sending subdomain |
 | `SITE_ORIGIN` | no | Allowed browser origins, comma-separated |
+| `SHOP_ADDRESS` | no | Included in mail-in replies when set |
 | `TURNSTILE_SECRET` | yes | Verifies the spam token; optional |
-
-For local Worker development:
-
-```powershell
-cd worker
-Copy-Item .dev.vars.example .dev.vars
-# edit .dev.vars with a real Resend key and a test recipient
-npx wrangler dev
-```
-
-The Worker listens on `http://localhost:8787`. Set the site's `formEndpoint` to `http://localhost:8787/repair-request` and add `http://localhost:3000` to `SITE_ORIGIN`.
+| `ADMIN_TOKEN` | yes | Protects the request inbox and admin API |
+| `DB` | binding | D1 request storage; optional but recommended |
 
 ---
 
@@ -286,49 +289,54 @@ The Worker listens on `http://localhost:8787`. Set the site's `formEndpoint` to 
 
 ### Services and estimator
 
-- **`assets/js/data.js`** — the device/fault tree, the check text, turnaround and starting labour. The home estimator and the request form prefill both read this file.
-- **`services.html`** — the visible rate card and service descriptions. Keep the numbers consistent with `data.js`.
-- **`index.html`** — the home services index and process slip.
+- **`assets/js/data.js`** — the device/fault tree, check text, turnaround and starting labor. `diagnostic: 0` renders as Free.
+- **`services.html`** — the rate card, service descriptions, at-a-glance facts and warranty.
+- **`index.html`** — hero, promise band, services index, process slip, test table, FAQ.
 
 ### Contact details
 
 - **`assets/js/config.js`** — one file for all pages. Elements with `data-contact="phone"`, `email`, `city`, `address-line1`, `address-line2` and `hours` are filled from it.
-- If you leave a value empty, the placeholder remains visible.
-- The structured data (`ElectronicsStore`) is only injected when `siteUrl`, `phone`, `street` and `city` are real.
+- Empty values stay as visible placeholders.
+- Structured data is injected only when `siteUrl`, `phone`, `street` and `city` are real.
 
-### Photos
+### Mail-in
 
-Replace a `.webp` at the same path and keep the same aspect ratio. Update `alt` text and, if the crop changes, the `width`/`height` attributes. The site uses WebP; browsers since 2020 support it.
+- **`mail-in.html`** — the public explanation and CTA. The CTA uses `request.html?mode=mail#request-form`.
+- **`request.html`** — the `data-mailin-fields` block and the `handoff` radios.
+- **`assets/js/form.js`** — shows the mail-in block, validates the return address and adds the fields to the payload.
+- **`worker/wrangler.toml`** — `SHOP_ADDRESS`, `TO_EMAIL`, `FROM_EMAIL`.
 
-### Fonts
+### Request inbox
 
-Archivo is self-hosted in `assets/fonts/archivo-var.woff2` under the SIL Open Font License. The licence is in `assets/fonts/OFL.txt`.
+- **`admin.html`**, **`assets/js/admin.js`** — the token gate, request list and status updates.
+- **`worker/schema.sql`** — the D1 table.
+- **`worker/src/index.js`** — intake, D1, email, admin API.
 
-### 404
+### Photos, fonts and 404
 
-GitHub Pages serves `404.html` for missing paths on the custom domain. On the `github.io` project preview, GitHub may show its own bare 404 for unknown paths; the page is still available directly at `/404.html`. Once the custom domain is active, the site sits at the root and the custom 404 applies.
+Replace a `.webp` at the same path. Archivo is self-hosted in `assets/fonts/archivo-var.woff2` under the SIL Open Font License; the license is in `assets/fonts/OFL.txt`. The 404 page is `404.html`.
 
 ### Sitemap and social preview
 
-There is no `sitemap.xml` because the domain was not known when the site was built. After the domain is live, you can add one, or submit the site directly in Google Search Console. Add an Open Graph image once you have a real photo:
+There is no `sitemap.xml` because the site is still being moved to its domain. Submit the domain in Google Search Console when it is live. Add an Open Graph image after a real photo is available:
 
 ```html
-<meta property="og:image" content="https://YOUR-DOMAIN.com/assets/img/bench-wide.webp">
+<meta property="og:image" content="https://fastfixitelectronics.com/assets/img/bench-wide.webp">
 ```
 
-The spec wants an absolute URL, so do this after the domain is live.
+The spec wants an absolute URL.
 
 ---
 
 ## Design notes
 
-- **One typeface:** Archivo, self-hosted, weights 100–900 from one variable file.
-- **Palette:** newsprint `#e8e5de`, ink `#161512`, brass `#c9a227`. Brass is used for actions, list marks and the work-order foot.
-- **The idea:** the repair work order, printed and followed. The process is a slip; the estimate is a ticket; the test pass is a table; the services are an index.
-- **The live thing:** the bench estimate. It uses real service content, updates the ticket, and hands a prefilled request to the form.
-- **Motion:** a slow hero crossfade between three bench details, staggered section entrances, control feedback. All content is visible with JavaScript off; the estimator and form have plain fallbacks.
-- **Accessibility:** skip link, keyboard-operable estimator and menu, visible focus, labelled fields, error summary and inline errors, `aria-live` status, reduced-motion support, 4.5:1 text contrast.
-- **No fake proof:** no invented reviews, customer logos, staff names or statistics. The About page is written as the shop's approach, not a fabricated history.
+- **Tracker V2 match:** warm canvas, white surfaces, ink, burnt-orange accent, Archivo, 8/12px radii, flat tone-separated cards and a light/dark toggle. The accent is `#c2410c` in light (a slightly darker burnt orange for text contrast) and `#ff7a3d` in dark. The tracker default is `#d9480f`; change `--accent` in `theme-v2.css` if you want the exact value.
+- **The idea:** the repair work order — a written estimate, a process slip, a test table, a mail-in ticket and a private request inbox.
+- **The live thing:** the bench estimate. It uses the real service tree, updates the ticket and prefills the request form.
+- **Free diagnosis and warranty** are stated in the hero, the promise band, the process slip, the estimator ticket, services, about, request, FAQ and both emails.
+- **No fake proof:** no invented reviews, customer logos, staff names or statistics. The About page is the shop's approach, not a fabricated history.
+- **Motion:** hero crossfade, slow photo drifts, staggered section entrances and control feedback. Content is visible with JavaScript off; the estimator and form have plain fallbacks.
+- **Accessibility:** skip link, keyboard-operable estimator and menu, visible focus, labelled fields, error summary, `aria-live` status, reduced-motion support and 4.5:1+ text contrast.
 
 ---
 
@@ -338,8 +346,10 @@ The spec wants an absolute URL, so do this after the domain is live.
 .
 ├── index.html
 ├── services.html
+├── mail-in.html
 ├── about.html
 ├── request.html
+├── admin.html
 ├── privacy.html
 ├── 404.html
 ├── CNAME.example
@@ -357,7 +367,9 @@ The spec wants an absolute URL, so do this after the domain is live.
 │   │   ├── badge-512.png
 │   │   ├── badge-1200.webp
 │   │   └── _source/Fastfixit-original.png
-│   ├── css/site.css
+│   ├── css
+│   │   ├── site.css
+│   │   └── theme-v2.css
 │   ├── fonts
 │   │   ├── archivo-var.woff2
 │   │   └── OFL.txt
@@ -373,8 +385,10 @@ The spec wants an absolute URL, so do this after the domain is live.
 │       ├── boot.js
 │       ├── site.js
 │       ├── estimator.js
-│       └── form.js
+│       ├── form.js
+│       └── admin.js
 └── worker
+    ├── schema.sql
     ├── src/index.js
     ├── wrangler.toml
     └── .dev.vars.example
@@ -385,20 +399,22 @@ The spec wants an absolute URL, so do this after the domain is live.
 ## Launch checklist
 
 - [ ] Fill `assets/js/config.js` (phone, email, address, city, hours, site URL).
-- [ ] Add a `mapUrl` if you want the "Directions" link, and set `country` if you are outside the US.
+- [ ] Set `formEndpoint` to the deployed Worker.
 - [ ] Set your own starting prices in `assets/js/data.js` and `services.html`.
-- [ ] Confirm the warranty, turnaround, diagnostic fee and test promises.
-- [ ] Remove any service you don't offer and confirm the equipment list on `about.html`.
-- [ ] Replace the five AI photographs with real shop photos and update alt text.
-- [ ] Read and adjust `privacy.html`; add your legal entity details if needed.
-- [ ] Deploy the Worker, verify Resend, set `formEndpoint`.
-- [ ] Turn on Turnstile and set both keys.
-- [ ] Submit a real test request with a photo; check both emails and spam folders.
-- [ ] Set the custom domain in GitHub Pages and the Cloudflare DNS records.
+- [ ] Confirm free diagnosis, 90-day warranty, turnaround and test promises.
+- [ ] Confirm the mail-in return-shipping policy and `SHOP_ADDRESS`.
+- [ ] Remove any service you don't offer and confirm the equipment list.
+- [ ] Replace the five AI photos with real shop photos and update alt text.
+- [ ] Read and adjust `privacy.html`.
+- [ ] Create D1, deploy the Worker, run the schema.
+- [ ] Set `ADMIN_TOKEN`, then bookmark `admin.html` and test it.
+- [ ] Set Resend on a sending subdomain and test both emails.
+- [ ] Set Turnstile site key and secret.
+- [ ] Add the Cloudflare DNS records and set the GitHub Pages custom domain.
 - [ ] Turn on Enforce HTTPS.
-- [ ] Check every page at 390 px, 768 px and 1440 px.
-- [ ] Check the 404 page, the privacy link and the footer links.
-- [ ] Remove the `[YOUR-DOMAIN]` values from `wrangler.toml` and `CNAME.example` if you don't want them in the repo.
+- [ ] Check every page at 390, 768 and 1440 px in light and dark.
+- [ ] Check the 404 page, privacy link, mail-in links and footer.
+- [ ] Submit a real drop-off request and a real mail-in request.
 
 ---
 
@@ -407,4 +423,4 @@ The spec wants an absolute URL, so do this after the domain is live.
 - Logo: supplied by FastFixIt Electronics.
 - Typeface: [Archivo](https://github.com/Omnibus-Type/Archivo), SIL Open Font License 1.1.
 - Photography: generated placeholder images, not the client's own work. Replace before launch.
-- Built as a static site. No framework, no analytics, no third-party JavaScript except the optional Cloudflare Turnstile widget.
+- Built as a static site with a Cloudflare Worker, D1 and optional Resend/Turnstile. No framework, no analytics.

@@ -1,4 +1,4 @@
-/* FastFixIt Electronics — shared page behaviour */
+/* FastFixIt Electronics — shared page behavior */
 (function () {
   "use strict";
 
@@ -201,8 +201,40 @@
 
   function initDiagnosticFee() {
     if (!window.FFI_DATA || window.FFI_DATA.diagnostic == null) return;
+    var fee = Number(window.FFI_DATA.diagnostic);
     $$("[data-diagnostic]").forEach(function (el) {
-      el.textContent = "$" + window.FFI_DATA.diagnostic;
+      el.textContent = fee > 0 ? "$" + fee : "Free";
+    });
+  }
+
+  /* ------------------------------------------------------------
+     Theme toggle
+     ------------------------------------------------------------ */
+  function initThemeToggle() {
+    var toggle = $("[data-theme-toggle]");
+    if (!toggle) return;
+    var root = document.documentElement;
+
+    function sync() {
+      var dark = root.dataset.theme === "dark";
+      toggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+      toggle.setAttribute("title", dark ? "Switch to light mode" : "Switch to dark mode");
+    }
+
+    sync();
+
+    toggle.addEventListener("click", function () {
+      var next = root.dataset.theme === "dark" ? "light" : "dark";
+      root.dataset.theme = next;
+      root.style.colorScheme = next;
+      try {
+        localStorage.setItem("ffi-theme", next);
+      } catch (error) {
+        /* The theme still changes for this page. */
+      }
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute("content", next === "dark" ? "#0f1114" : "#f4f1ea");
+      sync();
     });
   }
 
@@ -246,6 +278,7 @@
     initCrossfade();
     initYear();
     initDiagnosticFee();
+    initThemeToggle();
     initStructuredData();
   }
 

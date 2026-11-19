@@ -1,18 +1,14 @@
 /**
- * FastFixIt Electronics — repair request endpoint
+ * FastFixIt Electronics — repair request and mail-in intake
  *
- * Receives the JSON form payload from the static site, verifies Turnstile
- * (when configured), emails the shop through Resend, and sends the customer
- * a short confirmation.
+ * POST /repair-request       public intake (drop-off or mail-in)
+ * GET  /admin/requests       protected list of recent requests
+ * PATCH /admin/requests/:ref protected status update
+ * GET  /health
  *
- * Required environment:
- *   RESEND_API_KEY   secret
- *   TO_EMAIL         shop inbox (comma-separated allowed)
- *   FROM_EMAIL       verified Resend sender, e.g. "FastFixIt Repairs <repairs@example.com>"
- *
- * Optional:
- *   SITE_ORIGIN      comma-separated allowed origins; "*" allows any
- *   TURNSTILE_SECRET Cloudflare Turnstile secret
+ * Storage: Cloudflare D1 when the DB binding is present. Email through
+ * Resend when the email variables are present. The form still works with
+ * either one configured; both is the intended setup.
  */
 
 const MAX_BODY_BYTES = 12 * 1024 * 1024;
@@ -20,6 +16,21 @@ const MAX_PHOTOS = 3;
 const MAX_PHOTO_BYTES = 3 * 1024 * 1024;
 const MAX_TOTAL_PHOTO_BYTES = 8 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_STATUSES = new Set([
+  "new",
+  "awaiting-device",
+  "received",
+  "diagnosing",
+  "quoted",
+  "waiting-on-customer",
+  "approved",
+  "repairing",
+  "testing",
+  "ready",
+  "shipped",
+  "closed",
+  "canceled"
+]);
 
 export default {
   async fetch(request, env, ctx) {
@@ -31,7 +42,15 @@ export default {
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
-      return json({ ok: true, service: "fastfixit-repairs" }, 200, cors);
+      return json({ ok: true, service: "fastfixit-repairs", storage: Boolean(env.DB) }, 200, cors);
+    }
+
+    if (url.pathname === "/admin/requests") {
+      return handleAdminList(request, env, cors);
+    }
+
+    if (url.pathname.startsWith("/admin/requests/")) {
+      return handleAdminUpdate(request, env, cors, url.pathname.slice("/admin/requests/".length));
     }
 
     if (url.pathname !== "/repair-request") {
@@ -46,8 +65,8 @@ export default {
       return json({ ok: false, error: "Origin not allowed." }, 403, cors);
     }
 
-    if (!env.RESEND_API_KEY || !env.TO_EMAIL || !env.FROM_EMAIL) {
-      console.error("repair endpoint is missing email configuration");
+    if (!env.DB && (!env.RESEND_API_KEY || !env.TO_EMAIL || !env.FROM_EMAIL)) {
+      console.error("repair endpoint is missing both storage and email configuration");
       return json({ ok: false, error: "The request form is not configured yet." }, 500, cors);
     }
 
@@ -104,7 +123,9 @@ export default {
 
     const record = {
       reference: makeReference(),
-      receivedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      status: "new",
       name: clip(clean(body.name), 120),
       email: clip(clean(body.email), 200),
       phone: clip(clean(body.phone), 60),
@@ -119,59 +140,191 @@ export default {
       previous: clip(clean(body.previous), 80),
       liquid: clip(clean(body.liquid), 80),
       handoff: clip(clean(body.handoff), 80),
+      mailIn: body.mailIn === true || clean(body.handoff) === "Mail it in",
+      returnStreet: clip(clean(body.returnStreet), 200),
+      returnCity: clip(clean(body.returnCity), 120),
+      returnState: clip(clean(body.returnState), 2).toUpperCase(),
+      returnZip: clip(clean(body.returnZip), 10),
+      returnAddress: "",
+      shippingCarrier: clip(clean(body.shippingCarrier), 40),
+      trackingNumber: clip(clean(body.trackingNumber), 100),
+      accessories: clip(clean(body.accessories), 300),
       estimate: clip(clean(body.estimate), 300),
+      photoCount: 0,
+      emailStatus: "pending",
       ip: request.headers.get("CF-Connecting-IP") || "",
       country: (request.cf && request.cf.country) || ""
     };
 
-    const problems = validate(record);
+    record.returnAddress = formatAddress(record);
+
+    const problems = validate(record, body);
     const photos = collectPhotos(body.photos);
     record.photoCount = photos.attachments.length;
     if (photos.error) problems.push(photos.error);
 
     if (problems.length) {
-      return json(
-        { ok: false, error: problems[0] || "Please check the form and try again." },
-        400,
-        cors
-      );
+      return json({ ok: false, error: problems[0] }, 400, cors);
     }
 
-    let delivered;
-    try {
-      delivered = await sendShopEmail(env, record, photos.attachments);
-    } catch (error) {
-      console.error("shop email failed", record.reference, error && error.message);
+    const stored = await storeRequest(env, record);
+    let emailed = false;
+    let emailError = "";
+
+    if (env.RESEND_API_KEY && env.TO_EMAIL && env.FROM_EMAIL) {
+      try {
+        emailed = await sendShopEmail(env, record, photos.attachments);
+        if (!emailed) emailError = "Resend rejected the request.";
+      } catch (error) {
+        emailError = error && error.message ? error.message : "Email failed.";
+        console.error("shop email failed", record.reference, emailError);
+      }
+    } else {
+      emailError = "Email is not configured.";
+    }
+
+    record.emailStatus = emailed ? "sent" : "failed";
+    if (stored) await updateEmailStatus(env, record);
+
+    if (!stored && !emailed) {
+      console.error("request not stored or emailed", record.reference);
       return json(
-        { ok: false, error: "We couldn't send the request. Please email the shop directly." },
+        {
+          ok: false,
+          error: "We couldn't save or send the request. Please email the shop directly."
+        },
         502,
         cors
       );
     }
 
-    if (!delivered) {
-      return json(
-        { ok: false, error: "We couldn't send the request. Please email the shop directly." },
-        502,
-        cors
+    if (emailed && record.email) {
+      ctx.waitUntil(
+        sendCustomerEmail(env, record).catch((error) => {
+          console.error("customer email failed", record.reference, error && error.message);
+        })
       );
-    }
-
-    // The customer gets a confirmation, but its failure must not hide the
-    // fact that the shop received the request.
-    if (record.email) {
-      ctx.waitUntil(sendCustomerEmail(env, record).catch((error) => {
-        console.error("customer email failed", record.reference, error && error.message);
-      }));
     }
 
     return json(
-      { ok: true, reference: record.reference, message: "Request received." },
+      {
+        ok: true,
+        reference: record.reference,
+        stored,
+        emailed,
+        message: "Request received."
+      },
       200,
       cors
     );
   }
 };
+
+/* ------------------------------------------------------------------ */
+/* Admin                                                               */
+/* ------------------------------------------------------------------ */
+
+async function handleAdminList(request, env, cors) {
+  if (request.method !== "GET" && request.method !== "OPTIONS") {
+    return json({ ok: false, error: "Method not allowed." }, 405, cors);
+  }
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
+
+  const auth = requireAdmin(request, env);
+  if (!auth.ok) return json({ ok: false, error: auth.error }, auth.status, cors);
+  if (!env.DB) {
+    return json({ ok: false, error: "Storage is not configured." }, 503, cors);
+  }
+
+  const url = new URL(request.url);
+  const limit = Math.min(Math.max(Number(url.searchParams.get("limit")) || 50, 1), 200);
+
+  try {
+    const result = await env.DB.prepare(
+      "SELECT * FROM repair_requests ORDER BY created_at DESC LIMIT ?"
+    )
+      .bind(limit)
+      .all();
+    return json({ ok: true, requests: result.results || [] }, 200, cors);
+  } catch (error) {
+    console.error("admin list failed", error && error.message);
+    return json({ ok: false, error: "Could not read requests." }, 500, cors);
+  }
+}
+
+async function handleAdminUpdate(request, env, cors, encodedReference) {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
+  if (request.method !== "PATCH") {
+    return json({ ok: false, error: "Method not allowed." }, 405, cors);
+  }
+
+  const auth = requireAdmin(request, env);
+  if (!auth.ok) return json({ ok: false, error: auth.error }, auth.status, cors);
+  if (!env.DB) {
+    return json({ ok: false, error: "Storage is not configured." }, 503, cors);
+  }
+
+  let reference;
+  try {
+    reference = decodeURIComponent(encodedReference);
+  } catch (error) {
+    return json({ ok: false, error: "Invalid reference." }, 400, cors);
+  }
+
+  if (!/^FF-\d{6}-[A-Z0-9]{4}$/.test(reference)) {
+    return json({ ok: false, error: "Invalid reference." }, 400, cors);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    return json({ ok: false, error: "Invalid request." }, 400, cors);
+  }
+
+  const status = clean(body.status);
+  if (!ALLOWED_STATUSES.has(status)) {
+    return json({ ok: false, error: "Unknown status." }, 400, cors);
+  }
+
+  try {
+    const result = await env.DB.prepare(
+      "UPDATE repair_requests SET status = ?, updated_at = ? WHERE reference = ?"
+    )
+      .bind(status, new Date().toISOString(), reference)
+      .run();
+
+    if (!result.meta || result.meta.changes === 0) {
+      return json({ ok: false, error: "Request not found." }, 404, cors);
+    }
+
+    return json({ ok: true, reference, status }, 200, cors);
+  } catch (error) {
+    console.error("admin update failed", reference, error && error.message);
+    return json({ ok: false, error: "Could not update the request." }, 500, cors);
+  }
+}
+
+function requireAdmin(request, env) {
+  if (!env.ADMIN_TOKEN) {
+    return { ok: false, status: 503, error: "Admin access is not configured." };
+  }
+  const header = request.headers.get("Authorization") || "";
+  const token = header.toLowerCase().startsWith("bearer ") ? header.slice(7).trim() : "";
+  if (!constantTimeEqual(token, env.ADMIN_TOKEN)) {
+    return { ok: false, status: 401, error: "Admin token rejected." };
+  }
+  return { ok: true };
+}
+
+function constantTimeEqual(a, b) {
+  if (typeof a !== "string" || typeof b !== "string" || a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i += 1) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
 
 /* ------------------------------------------------------------------ */
 /* Request helpers                                                     */
@@ -181,12 +334,12 @@ function corsHeaders(request, env) {
   const allowed = allowedOrigins(env);
   const origin = request.headers.get("Origin") || "";
   const headers = new Headers({
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400",
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
-    "Vary": "Origin"
+    Vary: "Origin"
   });
 
   if (!allowed.length || allowed.includes("*")) {
@@ -209,7 +362,7 @@ function originAllowed(request, env) {
   const allowed = allowedOrigins(env);
   if (!allowed.length || allowed.includes("*")) return true;
   const origin = request.headers.get("Origin");
-  if (!origin) return true; // non-browser clients are still subject to Turnstile
+  if (!origin) return true;
   return allowed.includes(origin);
 }
 
@@ -228,7 +381,13 @@ function headerSafe(value) {
     .trim();
 }
 
-function validate(record) {
+function formatAddress(record) {
+  if (!record.returnStreet && !record.returnCity) return "";
+  const cityLine = [record.returnCity, record.returnState].filter(Boolean).join(", ");
+  return [record.returnStreet, cityLine, record.returnZip].filter(Boolean).join(", ");
+}
+
+function validate(record, body) {
   const problems = [];
   if (record.name.length < 2) problems.push("Please add your name.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(record.email)) {
@@ -237,6 +396,15 @@ function validate(record) {
   if (!record.device) problems.push("Please choose the kind of device.");
   if (!record.faultLabel) problems.push("Please choose what the device is doing.");
   if (record.details.length < 12) problems.push("Please add a sentence about the fault.");
+
+  if (record.mailIn) {
+    if (record.returnStreet.length < 4) problems.push("Please add the return street address.");
+    if (record.returnCity.length < 2) problems.push("Please add the return city.");
+    if (!/^[A-Z]{2}$/.test(record.returnState)) problems.push("Please add the two-letter state.");
+    if (!/^\d{5}(-\d{4})?$/.test(record.returnZip)) problems.push("Please add a valid ZIP code.");
+    if (body.packingAck !== true) problems.push("Please confirm you will pack the device securely.");
+  }
+
   return problems;
 }
 
@@ -325,42 +493,109 @@ function json(payload, status, cors) {
 }
 
 /* ------------------------------------------------------------------ */
+/* D1                                                                  */
+/* ------------------------------------------------------------------ */
+
+async function storeRequest(env, record) {
+  if (!env.DB) return false;
+
+  const fields = {
+    reference: record.reference,
+    created_at: record.createdAt,
+    updated_at: record.updatedAt,
+    status: record.status,
+    name: record.name,
+    email: record.email,
+    phone: record.phone,
+    contact: record.contact,
+    device: record.device,
+    device_id: record.deviceId,
+    model: record.model,
+    serial: record.serial,
+    fault_category: record.faultCategory,
+    fault_label: record.faultLabel,
+    details: record.details,
+    previous: record.previous,
+    liquid: record.liquid,
+    handoff: record.handoff,
+    mail_in: record.mailIn ? 1 : 0,
+    return_street: record.returnStreet,
+    return_city: record.returnCity,
+    return_state: record.returnState,
+    return_zip: record.returnZip,
+    return_address: record.returnAddress,
+    shipping_carrier: record.shippingCarrier,
+    tracking_number: record.trackingNumber,
+    accessories: record.accessories,
+    estimate: record.estimate,
+    photo_count: record.photoCount,
+    email_status: record.emailStatus,
+    notes: ""
+  };
+
+  const columns = Object.keys(fields);
+  const sql = `INSERT INTO repair_requests (${columns.join(", ")}) VALUES (${columns
+    .map(() => "?")
+    .join(", ")})`;
+
+  try {
+    await env.DB.prepare(sql)
+      .bind(...Object.values(fields))
+      .run();
+    return true;
+  } catch (error) {
+    console.error("d1 insert failed", record.reference, error && error.message);
+    return false;
+  }
+}
+
+async function updateEmailStatus(env, record) {
+  if (!env.DB) return;
+  try {
+    await env.DB.prepare(
+      "UPDATE repair_requests SET email_status = ?, updated_at = ? WHERE reference = ?"
+    )
+      .bind(record.emailStatus, new Date().toISOString(), record.reference)
+      .run();
+  } catch (error) {
+    console.error("d1 email status update failed", record.reference, error && error.message);
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Email                                                               */
 /* ------------------------------------------------------------------ */
 
 async function sendShopEmail(env, record, attachments) {
-  const to = String(env.TO_EMAIL)
+  const to = String(env.TO_EMAIL || "")
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean);
 
-  const subject = `Repair request ${record.reference} — ${headerSafe(record.device) || "device"} — ${headerSafe(record.name)}`;
-  const html = shopHtml(record);
-  const text = shopText(record);
+  const subject = `${record.mailIn ? "MAIL-IN " : ""}Repair request ${record.reference} — ${headerSafe(
+    record.device
+  ) || "device"} — ${headerSafe(record.name)}`;
 
   return resend(env, {
     from: env.FROM_EMAIL,
     to,
     reply_to: record.email,
     subject,
-    html,
-    text,
+    html: shopHtml(record, env),
+    text: shopText(record),
     attachments
   });
 }
 
 async function sendCustomerEmail(env, record) {
   const subject = `We got your repair request (${record.reference})`;
-  const html = customerHtml(record);
-  const text = customerText(record);
-
   return resend(env, {
     from: env.FROM_EMAIL,
     to: [record.email],
-    reply_to: String(env.TO_EMAIL).split(",")[0].trim(),
+    reply_to: String(env.TO_EMAIL || "").split(",")[0].trim(),
     subject,
-    html,
-    text
+    html: customerHtml(record, env),
+    text: customerText(record)
   });
 }
 
@@ -388,10 +623,11 @@ async function resend(env, payload) {
   return true;
 }
 
-function shopHtml(record) {
+function shopHtml(record, env) {
   const rows = [
     ["Reference", record.reference],
-    ["Received", record.receivedAt],
+    ["Received", record.createdAt],
+    ["Status", record.status],
     ["Name", record.name],
     ["Email", record.email],
     ["Phone", record.phone || "—"],
@@ -403,28 +639,59 @@ function shopHtml(record) {
     ["Estimate selection", record.estimate || "—"],
     ["Previous work", record.previous || "—"],
     ["Liquid contact", record.liquid || "—"],
-    ["Drop-off or post", record.handoff || "—"],
+    ["Handoff", record.handoff || "—"],
+    ["Diagnosis", "Free"],
+    ["Warranty", "90 days on every repair"],
     ["Photos", String(record.photoCount || 0)]
-  ]
+  ];
+
+  if (record.mailIn) {
+    rows.push(
+      ["Mail-in", "Yes"],
+      ["Return address", record.returnAddress || "—"],
+      ["Carrier", record.shippingCarrier || "Not shipped yet"],
+      ["Tracking", record.trackingNumber || "—"],
+      ["Accessories", record.accessories || "—"]
+    );
+  }
+
+  const table = rows
     .map(
       ([label, value]) =>
-        `<tr><td style="padding:9px 14px;background:#f1eee7;color:#5f5c54;font:13px Arial,sans-serif;width:170px;vertical-align:top">${escapeHtml(label)}</td><td style="padding:9px 14px;background:#ffffff;color:#161512;font:15px Arial,sans-serif;vertical-align:top">${escapeHtml(String(value))}</td></tr>`
+        `<tr><td style="padding:9px 14px;background:#ece8df;color:#666b73;font:13px Arial,sans-serif;width:170px;vertical-align:top">${escapeHtml(
+          label
+        )}</td><td style="padding:9px 14px;background:#ffffff;color:#17191c;font:15px Arial,sans-serif;vertical-align:top">${escapeHtml(
+          String(value)
+        )}</td></tr>`
     )
     .join("");
 
-  return `<!doctype html><html><body style="margin:0;padding:24px;background:#e8e8e3">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0 auto;background:#ffffff">
-    <tr><td style="padding:20px 24px;background:#161512;color:#ece9e2;font:600 20px Arial,sans-serif">FastFixIt Electronics — new repair request</td></tr>
-    <tr><td style="padding:20px 24px 4px"><p style="margin:0;font:15px Arial,sans-serif;color:#161512">A request came in from the website. Reply to this email to answer the customer directly.</p></td></tr>
-    <tr><td style="padding:16px 24px 24px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows}</table></td></tr>
-    <tr><td style="padding:0 24px 24px"><p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#5f5c54">Fault description</p><p style="margin:0;padding:14px;background:#f1eee7;color:#161512;font:15px/1.55 Arial,sans-serif;white-space:pre-wrap">${escapeHtml(record.details)}</p></td></tr>
-    <tr><td style="padding:0 24px 24px;font:13px Arial,sans-serif;color:#5f5c54">Sent from the FastFixIt website${record.country ? " · " + escapeHtml(record.country) : ""}</td></tr>
+  const shopAddress = env.SHOP_ADDRESS && String(env.SHOP_ADDRESS).trim();
+
+  return `<!doctype html><html><body style="margin:0;padding:24px;background:#f4f1ea">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #d9d5cb;border-radius:12px;overflow:hidden">
+    <tr><td style="padding:20px 24px;background:#17191c;color:#ecedef;font:600 20px Arial,sans-serif">FastFixIt Electronics — new repair request</td></tr>
+    ${
+      record.mailIn
+        ? `<tr><td style="padding:12px 24px;background:#c2410c;color:#ffffff;font:600 14px Arial,sans-serif">MAIL-IN — do not ship until you have replied with the address and reference</td></tr>`
+        : ""
+    }
+    <tr><td style="padding:20px 24px 4px"><p style="margin:0;font:15px Arial,sans-serif;color:#17191c">A request came in from the website. Reply to this email to answer the customer directly.${
+      shopAddress ? ` The shop address on file is ${escapeHtml(shopAddress)}.` : ""
+    }</p></td></tr>
+    <tr><td style="padding:16px 24px 24px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${table}</table></td></tr>
+    <tr><td style="padding:0 24px 24px"><p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#666b73">Fault description</p><p style="margin:0;padding:14px;background:#f4f1ea;color:#17191c;font:15px/1.55 Arial,sans-serif;white-space:pre-wrap">${escapeHtml(
+      record.details
+    )}</p></td></tr>
+    <tr><td style="padding:0 24px 24px;font:13px Arial,sans-serif;color:#666b73">Sent from the FastFixIt website${
+      record.country ? " · " + escapeHtml(record.country) : ""
+    }</td></tr>
   </table></body></html>`;
 }
 
 function shopText(record) {
-  return [
-    `New repair request — ${record.reference}`,
+  const lines = [
+    `${record.mailIn ? "MAIL-IN — " : ""}New repair request — ${record.reference}`,
     "",
     `Name: ${record.name}`,
     `Email: ${record.email}`,
@@ -438,33 +705,67 @@ function shopText(record) {
     `Previous work: ${record.previous || "—"}`,
     `Liquid: ${record.liquid || "—"}`,
     `Handoff: ${record.handoff || "—"}`,
+    "Diagnosis: Free",
+    "Warranty: 90 days on every repair",
     `Photos: ${record.photoCount || 0}`,
-    "",
-    "Details:",
-    record.details
-  ].join("\n");
+    ""
+  ];
+
+  if (record.mailIn) {
+    lines.push(
+      "Mail-in details:",
+      `Return address: ${record.returnAddress || "—"}`,
+      `Carrier: ${record.shippingCarrier || "Not shipped yet"}`,
+      `Tracking: ${record.trackingNumber || "—"}`,
+      `Accessories: ${record.accessories || "—"}`,
+      ""
+    );
+  }
+
+  lines.push("Details:", record.details);
+  return lines.join("\n");
 }
 
-function customerHtml(record) {
-  return `<!doctype html><html><body style="margin:0;padding:24px;background:#e8e8e3">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#ffffff">
-    <tr><td style="padding:20px 24px;background:#161512;color:#ece9e2;font:600 20px Arial,sans-serif">FastFixIt Electronics</td></tr>
+function customerHtml(record, env) {
+  const shopAddress = env.SHOP_ADDRESS && String(env.SHOP_ADDRESS).trim();
+  const mailInIntro = record.mailIn
+    ? `<p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#17191c"><strong>This is a mail-in request.</strong> Don't ship yet. We'll reply with the shipping address and packing instructions. Put your reference inside the box, and reply with the carrier and tracking number after you ship.</p>
+       <p style="margin:0 0 14px;padding:14px;background:#fbe9e1;border:1px solid #f3c8b5;border-radius:8px;font:14px/1.6 Arial,sans-serif;color:#17191c">${
+         shopAddress
+           ? `Ship to: <strong>${escapeHtml(shopAddress)}</strong>`
+           : "We'll send the shipping address in our reply."
+       }</p>`
+    : "";
+
+  return `<!doctype html><html><body style="margin:0;padding:24px;background:#f4f1ea">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #d9d5cb;border-radius:12px;overflow:hidden">
+    <tr><td style="padding:20px 24px;background:#17191c;color:#ecedef;font:600 20px Arial,sans-serif">FastFixIt Electronics</td></tr>
     <tr><td style="padding:24px">
-      <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#161512">Hi ${escapeHtml(record.name)},</p>
-      <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#161512">We've got your repair request. Your reference is <strong>${escapeHtml(record.reference)}</strong>.</p>
-      <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#161512">A person at the bench will reply within one business day. If you have more photos, reply to this email and attach them.</p>
-      <p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#5f5c54">What you sent</p>
-      <p style="margin:0 0 14px;padding:14px;background:#f1eee7;color:#161512;font:14px/1.6 Arial,sans-serif">${escapeHtml(record.device)}${record.model ? " · " + escapeHtml(record.model) : ""}<br>${escapeHtml(record.faultLabel)}<br><span style="color:#5f5c54">${escapeHtml(record.details.slice(0, 500))}${record.details.length > 500 ? "…" : ""}</span></p>
-      <p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#5f5c54">What happens next</p>
-      <ol style="margin:0 0 18px;padding-left:18px;font:14px/1.6 Arial,sans-serif;color:#161512">
-        <li>We read the request and reply.</li>
-        <li>Bench diagnosis, usually 24–48 hours.</li>
+      <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#17191c">Hi ${escapeHtml(record.name)},</p>
+      <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#17191c">We've got your repair request. Your reference is <strong style="font-family:Arial,sans-serif">${escapeHtml(
+        record.reference
+      )}</strong>.</p>
+      ${mailInIntro}
+      <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#17191c"><strong>Diagnosis is free.</strong> You'll get a written quote before any work. Every repair includes a 90-day workmanship warranty.</p>
+      <p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#666b73">What you sent</p>
+      <p style="margin:0 0 14px;padding:14px;background:#f4f1ea;color:#17191c;font:14px/1.6 Arial,sans-serif">${escapeHtml(
+        record.device
+      )}${record.model ? " · " + escapeHtml(record.model) : ""}<br>${escapeHtml(
+        record.faultLabel
+      )}<br><span style="color:#666b73">${escapeHtml(record.details.slice(0, 500))}${
+        record.details.length > 500 ? "…" : ""
+      }</span></p>
+      <p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#666b73">What happens next</p>
+      <ol style="margin:0 0 18px;padding-left:18px;font:14px/1.6 Arial,sans-serif;color:#17191c">
+        <li>We read the request and reply within one business day.</li>
+        <li>Free bench diagnosis, usually 24–48 hours.</li>
         <li>You get a written quote. Nothing happens until you approve it.</li>
         <li>Repair, then a 24-hour test.</li>
+        <li>${record.mailIn ? "We confirm return shipping and send it back with tracking." : "Collect in person, or we ship it back with tracking."}</li>
       </ol>
-      <p style="margin:0;font:13px/1.5 Arial,sans-serif;color:#5f5c54">The bench diagnostic is credited toward the repair if you approve the quote. This is not a quote.</p>
+      <p style="margin:0;font:13px/1.5 Arial,sans-serif;color:#666b73">Diagnosis is free. If we can't find the fault, you still get a written explanation. This is not a quote.</p>
     </td></tr>
-    <tr><td style="padding:16px 24px;background:#f1eee7;font:13px/1.5 Arial,sans-serif;color:#5f5c54">FastFixIt Electronics, LLC</td></tr>
+    <tr><td style="padding:16px 24px;background:#ece8df;font:13px/1.5 Arial,sans-serif;color:#666b73">FastFixIt Electronics, LLC</td></tr>
   </table></body></html>`;
 }
 
@@ -473,12 +774,18 @@ function customerText(record) {
     `Hi ${record.name},`,
     "",
     `We've got your repair request. Your reference is ${record.reference}.`,
+    record.mailIn
+      ? "This is a mail-in request. Don't ship yet. We'll reply with the shipping address and packing instructions. Put your reference inside the box, and reply with the carrier and tracking number after you ship."
+      : "A person at the bench will reply within one business day.",
+    "",
     `Device: ${record.device}${record.model ? " · " + record.model : ""}`,
     `Fault: ${record.faultLabel}`,
     "",
-    "A person at the bench will reply within one business day. If you have more photos, reply to this email and attach them.",
+    "Diagnosis is free. You'll get a written quote before any work. Every repair includes a 90-day workmanship warranty.",
     "",
-    "The bench diagnostic is credited toward the repair if you approve the quote. This is not a quote.",
+    record.mailIn
+      ? "What happens next: we reply with the shipping address, then free diagnosis, a written quote, the repair, a 24-hour test, and return shipping with tracking."
+      : "What happens next: free diagnosis, a written quote, the repair, a 24-hour test, then collect in person or we ship it back.",
     "",
     "FastFixIt Electronics, LLC"
   ].join("\n");
