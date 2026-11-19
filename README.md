@@ -281,7 +281,76 @@ The page is `noindex` and is not linked from the public site. For a stronger loc
 | `SHOP_ADDRESS` | no | Included in mail-in replies when set |
 | `TURNSTILE_SECRET` | yes | Verifies the spam token; optional |
 | `ADMIN_TOKEN` | yes | Protects the request inbox and admin API |
+| `TRACKER_URL` | no | RepairTrackerV2 origin for the intake API; leave empty to disable ticketing |
+| `TRACKER_PUBLIC_URL` | no | Public origin used in customer links (defaults to `TRACKER_URL`) |
+| `TRACKER_AUTO_CREATE` | no | `0` pauses automatic ticket creation at deploy time |
+| `TRACKER_INTAKE_TOKEN` | yes | Bearer token for the tracker's `/api/intake` |
 | `DB` | binding | D1 request storage; optional but recommended |
+
+---
+
+## RepairTrackerV2 tickets and payments
+
+The request inbox can create a ticket in **RepairTrackerV2** automatically, then
+link staff and customers to the tracker's own status portal and Stripe payment
+page. The website never stores card data.
+
+### What happens on submit
+
+1. The request is stored in D1 as before.
+2. The Worker posts it to `POST <TRACKER_URL>/api/intake` with the shared token.
+3. The tracker matches the customer by email (or creates one), creates the
+   device, and opens a ticket on the first workflow status ("Received").
+4. D1 records `tracker_ticket_number`, `tracker_ticket_id`,
+   `tracker_public_token`, `tracker_status` and `tracker_synced_at`.
+5. The customer auto-reply includes `…/track/<publicToken>`, where they can
+   watch the status, approve a quote, and pay an invoice.
+
+If the tracker is unreachable, the request still saves, the inbox shows the
+error, and **Create ticket** retries. The **Auto-create tickets** switch in the
+inbox pauses automatic syncing without a deploy.
+
+### Enable it
+
+1. Deploy RepairTrackerV2 (see its `docs/DEPLOY.md`) and set
+   `INTAKE_API_TOKEN` plus `INTAKE_ORG_ID` in its `.env`.
+2. Put the same token in `worker/.dev.vars` locally and in the Worker secret:
+
+   ```powershell
+   npx wrangler secret put TRACKER_INTAKE_TOKEN
+   ```
+
+3. Uncomment `TRACKER_URL` and `TRACKER_PUBLIC_URL` in `worker/wrangler.toml`
+   and deploy:
+
+   ```powershell
+   npx wrangler deploy
+   ```
+
+4. Confirm `https://api.fastfixitelectronics.com/health` returns `"tracker":true`.
+
+The tracker expects a public HTTPS origin reachable from Cloudflare. It does not
+need to be reachable from the open internet if you put Cloudflare Access in
+front, but the Worker must be allowed through.
+
+### Database migration
+
+The tracker columns and the settings table are in
+`worker/migrations/002-tracker.sql`:
+
+```powershell
+npx wrangler d1 execute fastfixit-requests --remote --file=migrations/002-tracker.sql
+```
+
+Fresh installs get the same columns from `schema.sql`.
+
+### Invoices and payment
+
+Invoices and Stripe Checkout live entirely in RepairTrackerV2. Once an invoice
+exists, the customer sees **View and pay invoice** in their `/track/<token>`
+page. The shop can also send the invoice's own `/pay/<payToken>` link from the
+tracker. Stripe needs `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` on the
+tracker, with `APP_URL` set to its public origin.
 
 ---
 

@@ -33,7 +33,19 @@ CREATE TABLE IF NOT EXISTS repair_requests (
   estimate TEXT,
   photo_count INTEGER NOT NULL DEFAULT 0,
   email_status TEXT,
+  tracker_ticket_number INTEGER,
+  tracker_ticket_id TEXT,
+  tracker_public_token TEXT,
+  tracker_status TEXT,
+  tracker_synced_at TEXT,
+  tracker_error TEXT,
   notes TEXT
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_repair_requests_created

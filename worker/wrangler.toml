@@ -17,6 +17,14 @@ FROM_EMAIL = "FastFixIt Electronics <website@fastfixitelectronics.com>"
 # shipping address follows in the shop's reply instead of printing one.
 SHOP_ADDRESS = ""
 
+# RepairTrackerV2 intake. Leave TRACKER_URL empty until the shop server is
+# running; requests then store normally with the ticket left for later.
+# TRACKER_URL = "https://tracker.fastfixitelectronics.com"
+# TRACKER_PUBLIC_URL = "https://tracker.fastfixitelectronics.com"
+# TRACKER_AUTO_CREATE = "1"
+# The matching secret is TRACKER_INTAKE_TOKEN (same value as the tracker's
+# INTAKE_API_TOKEN).
+
 # D1 is the request inbox. Create it, then uncomment this block and run
 # the schema file. The form still works with email only when this is off.
 [[d1_databases]]

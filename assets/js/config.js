@@ -29,5 +29,8 @@ window.FFI_CONFIG = {
   turnstileSiteKey: "0x4AAAAAAGIeVmCJ8hgSB8JN",
 
   // Canonical site URL. Used for structured data.
-  siteUrl: "https://fastfixitelectronics.com"
+  siteUrl: "https://fastfixitelectronics.com",
+
+  // RepairTrackerV2. The inbox links tickets and customer status pages here.
+  trackerUrl: "https://tracker.fastfixitelectronics.com"
 };

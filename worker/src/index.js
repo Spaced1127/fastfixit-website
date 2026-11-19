@@ -42,11 +42,32 @@ export default {
     }
 
     if (url.pathname === "/health" && request.method === "GET") {
-      return json({ ok: true, service: "fastfixit-repairs", storage: Boolean(env.DB) }, 200, cors);
+      return json(
+        {
+          ok: true,
+          service: "fastfixit-repairs",
+          storage: Boolean(env.DB),
+          tracker: Boolean(env.TRACKER_URL && env.TRACKER_INTAKE_TOKEN)
+        },
+        200,
+        cors
+      );
     }
 
     if (url.pathname === "/admin/requests") {
       return handleAdminList(request, env, cors);
+    }
+
+    if (url.pathname === "/admin/settings") {
+      return handleAdminSettings(request, env, cors);
+    }
+
+    if (url.pathname.startsWith("/admin/requests/") && url.pathname.endsWith("/sync")) {
+      const reference = url.pathname.slice(
+        "/admin/requests/".length,
+        url.pathname.length - "/sync".length
+      );
+      return handleAdminSync(request, env, cors, reference);
     }
 
     if (url.pathname.startsWith("/admin/requests/")) {
@@ -152,6 +173,12 @@ export default {
       estimate: clip(clean(body.estimate), 300),
       photoCount: 0,
       emailStatus: "pending",
+      trackerTicketNumber: null,
+      trackerTicketId: "",
+      trackerPublicToken: "",
+      trackerStatus: "",
+      trackerSyncedAt: "",
+      trackerError: "",
       ip: request.headers.get("CF-Connecting-IP") || "",
       country: (request.cf && request.cf.country) || ""
     };
@@ -170,6 +197,10 @@ export default {
     const stored = await storeRequest(env, record);
     let emailed = false;
     let emailError = "";
+
+    if (stored) {
+      await syncTicket(env, record, { force: false });
+    }
 
     if (env.RESEND_API_KEY && env.TO_EMAIL && env.FROM_EMAIL) {
       try {
@@ -245,11 +276,146 @@ async function handleAdminList(request, env, cors) {
     )
       .bind(limit)
       .all();
-    return json({ ok: true, requests: result.results || [] }, 200, cors);
+    const requests = (result.results || []).map((row) => ({
+      ...row,
+      track_url: row.tracker_public_token
+        ? `${trackerPublicBase(env)}/track/${row.tracker_public_token}`
+        : ""
+    }));
+    return json({ ok: true, requests }, 200, cors);
   } catch (error) {
     console.error("admin list failed", error && error.message);
     return json({ ok: false, error: "Could not read requests." }, 500, cors);
   }
+}
+
+async function handleAdminSettings(request, env, cors) {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
+
+  const auth = requireAdmin(request, env);
+  if (!auth.ok) return json({ ok: false, error: auth.error }, auth.status, cors);
+  if (!env.DB) {
+    return json({ ok: false, error: "Storage is not configured." }, 503, cors);
+  }
+
+  if (request.method === "GET") {
+    return json(
+      {
+        ok: true,
+        autoCreate: await trackerAutoCreate(env),
+        trackerConfigured: Boolean(env.TRACKER_URL && env.TRACKER_INTAKE_TOKEN)
+      },
+      200,
+      cors
+    );
+  }
+
+  if (request.method !== "PATCH") {
+    return json({ ok: false, error: "Method not allowed." }, 405, cors);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    return json({ ok: false, error: "Invalid request." }, 400, cors);
+  }
+
+  if (typeof body.autoCreate !== "boolean") {
+    return json({ ok: false, error: "Send autoCreate as true or false." }, 400, cors);
+  }
+
+  await setTrackerAutoCreate(env, body.autoCreate);
+  return json({ ok: true, autoCreate: body.autoCreate }, 200, cors);
+}
+
+function rowToRecord(row) {
+  return {
+    reference: row.reference,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    device: row.device,
+    model: row.model,
+    serial: row.serial,
+    accessories: row.accessories,
+    previous: row.previous,
+    liquid: row.liquid,
+    faultLabel: row.fault_label,
+    details: row.details,
+    handoff: row.handoff,
+    returnAddress: row.return_address,
+    trackerTicketNumber: row.tracker_ticket_number ?? null,
+    trackerTicketId: row.tracker_ticket_id || "",
+    trackerPublicToken: row.tracker_public_token || "",
+    trackerStatus: row.tracker_status || "",
+    trackerSyncedAt: row.tracker_synced_at || "",
+    trackerError: row.tracker_error || ""
+  };
+}
+
+async function handleAdminSync(request, env, cors, encodedReference) {
+  if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
+  if (request.method !== "POST") {
+    return json({ ok: false, error: "Method not allowed." }, 405, cors);
+  }
+
+  const auth = requireAdmin(request, env);
+  if (!auth.ok) return json({ ok: false, error: auth.error }, auth.status, cors);
+  if (!env.DB) {
+    return json({ ok: false, error: "Storage is not configured." }, 503, cors);
+  }
+
+  let reference;
+  try {
+    reference = decodeURIComponent(encodedReference);
+  } catch (error) {
+    return json({ ok: false, error: "Invalid reference." }, 400, cors);
+  }
+
+  if (!/^FF-\d{6}-[A-Z0-9]{4}$/.test(reference)) {
+    return json({ ok: false, error: "Invalid reference." }, 400, cors);
+  }
+
+  const row = await env.DB.prepare("SELECT * FROM repair_requests WHERE reference = ?")
+    .bind(reference)
+    .first();
+
+  if (!row) {
+    return json({ ok: false, error: "Request not found." }, 404, cors);
+  }
+
+  if (row.tracker_ticket_number) {
+    return json(
+      {
+        ok: true,
+        already: true,
+        ticketNumber: row.tracker_ticket_number,
+        trackUrl: row.tracker_public_token
+          ? `${trackerPublicBase(env)}/track/${row.tracker_public_token}`
+          : ""
+      },
+      200,
+      cors
+    );
+  }
+
+  const record = rowToRecord(row);
+  const result = await syncTicket(env, record, { force: true });
+
+  if (!result.ok) {
+    return json({ ok: false, error: result.error || "Could not create the ticket." }, 502, cors);
+  }
+
+  return json(
+    {
+      ok: true,
+      ticketNumber: record.trackerTicketNumber,
+      trackUrl: trackUrl(env, record)
+    },
+    200,
+    cors
+  );
 }
 
 async function handleAdminUpdate(request, env, cors, encodedReference) {
@@ -530,6 +696,12 @@ async function storeRequest(env, record) {
     estimate: record.estimate,
     photo_count: record.photoCount,
     email_status: record.emailStatus,
+    tracker_ticket_number: record.trackerTicketNumber ?? null,
+    tracker_ticket_id: record.trackerTicketId || "",
+    tracker_public_token: record.trackerPublicToken || "",
+    tracker_status: record.trackerStatus || "",
+    tracker_synced_at: record.trackerSyncedAt || "",
+    tracker_error: record.trackerError || "",
     notes: ""
   };
 
@@ -563,6 +735,162 @@ async function updateEmailStatus(env, record) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Repair tracker intake                                               */
+/* ------------------------------------------------------------------ */
+
+function trackerBase(env) {
+  return String(env.TRACKER_URL || "").replace(/\/+$/, "");
+}
+
+function trackerPublicBase(env) {
+  return String(env.TRACKER_PUBLIC_URL || env.TRACKER_URL || "").replace(/\/+$/, "");
+}
+
+function trackUrl(env, record) {
+  const base = trackerPublicBase(env);
+  if (!base || !record.trackerPublicToken) return "";
+  return `${base}/track/${record.trackerPublicToken}`;
+}
+
+async function trackerAutoCreate(env) {
+  const fallback = String(env.TRACKER_AUTO_CREATE ?? "1") !== "0";
+  if (!env.DB) return fallback;
+  try {
+    const row = await env.DB.prepare("SELECT value FROM settings WHERE key = ?")
+      .bind("tracker_auto_create")
+      .first();
+    if (!row) return fallback;
+    return String(row.value) === "1";
+  } catch (error) {
+    return fallback;
+  }
+}
+
+async function setTrackerAutoCreate(env, enabled) {
+  if (!env.DB) return false;
+  await env.DB.prepare(
+    "INSERT INTO settings (key, value, updated_at) VALUES (?, ?, ?) " +
+      "ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at"
+  )
+    .bind("tracker_auto_create", enabled ? "1" : "0", new Date().toISOString())
+    .run();
+  return true;
+}
+
+async function saveTrackerFields(env, record) {
+  if (!env.DB) return;
+  try {
+    await env.DB.prepare(
+      "UPDATE repair_requests SET tracker_ticket_number = ?, tracker_ticket_id = ?, " +
+        "tracker_public_token = ?, tracker_status = ?, tracker_synced_at = ?, tracker_error = ?, " +
+        "updated_at = ? WHERE reference = ?"
+    )
+      .bind(
+        record.trackerTicketNumber ?? null,
+        record.trackerTicketId || "",
+        record.trackerPublicToken || "",
+        record.trackerStatus || "",
+        record.trackerSyncedAt || "",
+        record.trackerError || "",
+        new Date().toISOString(),
+        record.reference
+      )
+      .run();
+  } catch (error) {
+    console.error("d1 tracker update failed", record.reference, error && error.message);
+  }
+}
+
+/**
+ * Creates the ticket in RepairTrackerV2. Failures are recorded on the request
+ * instead of failing the submission, so the inbox can retry later.
+ */
+async function syncTicket(env, record, options = {}) {
+  const base = trackerBase(env);
+  const token = env.TRACKER_INTAKE_TOKEN || "";
+
+  if (!base || !token) {
+    record.trackerError = "Tracker is not configured.";
+    return { ok: false, skipped: true, error: record.trackerError };
+  }
+
+  if (!options.force && !(await trackerAutoCreate(env))) {
+    record.trackerError = "Automatic ticketing is paused.";
+    return { ok: false, skipped: true, error: record.trackerError };
+  }
+
+  const condition = [
+    record.previous ? `Previous work: ${record.previous}` : "",
+    record.liquid ? `Liquid: ${record.liquid}` : ""
+  ]
+    .filter(Boolean)
+    .join(". ");
+
+  try {
+    const response = await fetch(`${base}/api/intake`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        reference: record.reference,
+        name: record.name,
+        email: record.email,
+        phone: record.phone || "",
+        deviceType: record.device || "",
+        brand: "",
+        model: record.model || "",
+        serial: record.serial || "",
+        accessories: record.accessories || "",
+        condition,
+        fault: record.faultLabel || "Repair request",
+        details: record.details || "",
+        delivery: record.handoff || "",
+        address: record.returnAddress || ""
+      }),
+      signal: AbortSignal.timeout(8000)
+    });
+
+    let result = null;
+    try {
+      result = await response.json();
+    } catch (error) {
+      result = null;
+    }
+
+    if (!response.ok || !result || result.ok !== true) {
+      record.trackerError =
+        (result && result.error) || `The tracker returned ${response.status}.`;
+      await saveTrackerFields(env, record);
+      return { ok: false, error: record.trackerError };
+    }
+
+    record.trackerTicketNumber = result.ticketNumber;
+    record.trackerTicketId = result.ticketId || "";
+    record.trackerPublicToken = result.publicToken || "";
+    record.trackerStatus = "Received";
+    record.trackerSyncedAt = new Date().toISOString();
+    record.trackerError = "";
+    await saveTrackerFields(env, record);
+
+    return {
+      ok: true,
+      ticketNumber: record.trackerTicketNumber,
+      publicToken: record.trackerPublicToken
+    };
+  } catch (error) {
+    record.trackerError =
+      error && error.name === "TimeoutError"
+        ? "The tracker did not answer in time."
+        : "The tracker could not be reached.";
+    console.error("tracker sync failed", record.reference, error && error.message);
+    await saveTrackerFields(env, record);
+    return { ok: false, error: record.trackerError };
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Email                                                               */
 /* ------------------------------------------------------------------ */
 
@@ -582,7 +910,7 @@ async function sendShopEmail(env, record, attachments) {
     reply_to: record.email,
     subject,
     html: shopHtml(record, env),
-    text: shopText(record),
+    text: shopText(record, env),
     attachments
   });
 }
@@ -595,7 +923,7 @@ async function sendCustomerEmail(env, record) {
     reply_to: String(env.TO_EMAIL || "").split(",")[0].trim(),
     subject,
     html: customerHtml(record, env),
-    text: customerText(record)
+    text: customerText(record, env)
   });
 }
 
@@ -642,6 +970,11 @@ function shopHtml(record, env) {
     ["Handoff", record.handoff || "—"],
     ["Diagnosis", "Free"],
     ["Warranty", "90 days on every repair"],
+    [
+      "Tracker ticket",
+      record.trackerTicketNumber ? `#${record.trackerTicketNumber}` : record.trackerError || "Not created"
+    ],
+    ["Customer status link", trackUrl(env, record) || "—"],
     ["Photos", String(record.photoCount || 0)]
   ];
 
@@ -680,6 +1013,13 @@ function shopHtml(record, env) {
       shopAddress ? ` The shop address on file is ${escapeHtml(shopAddress)}.` : ""
     }</p></td></tr>
     <tr><td style="padding:16px 24px 24px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${table}</table></td></tr>
+    ${
+      record.trackerTicketNumber
+        ? `<tr><td style="padding:0 24px 20px"><p style="margin:0;font:14px Arial,sans-serif;color:#17191c">Ticket #${escapeHtml(
+            String(record.trackerTicketNumber)
+          )} is in the tracker. <a href="${escapeHtml(trackerBase(env))}/app/tickets" style="color:#c2410c">Open the tracker</a></p></td></tr>`
+        : ""
+    }
     <tr><td style="padding:0 24px 24px"><p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#666b73">Fault description</p><p style="margin:0;padding:14px;background:#f4f1ea;color:#17191c;font:15px/1.55 Arial,sans-serif;white-space:pre-wrap">${escapeHtml(
       record.details
     )}</p></td></tr>
@@ -689,7 +1029,7 @@ function shopHtml(record, env) {
   </table></body></html>`;
 }
 
-function shopText(record) {
+function shopText(record, env) {
   const lines = [
     `${record.mailIn ? "MAIL-IN — " : ""}New repair request — ${record.reference}`,
     "",
@@ -710,6 +1050,10 @@ function shopText(record) {
     `Photos: ${record.photoCount || 0}`,
     ""
   ];
+
+  if (record.trackerTicketNumber) lines.push(`Tracker ticket: #${record.trackerTicketNumber}`);
+  if (trackUrl(env, record)) lines.push(`Track your repair: ${trackUrl(env, record)}`);
+  if (record.trackerTicketNumber || trackUrl(env, record)) lines.push("");
 
   if (record.mailIn) {
     lines.push(
@@ -747,6 +1091,13 @@ function customerHtml(record, env) {
       )}</strong>.</p>
       ${mailInIntro}
       <p style="margin:0 0 14px;font:15px/1.6 Arial,sans-serif;color:#17191c"><strong>Diagnosis is free.</strong> You'll get a written quote before any work. Every repair includes a 90-day workmanship warranty.</p>
+      ${
+        trackUrl(env, record)
+          ? `<p style="margin:0 0 14px;padding:14px;background:#fbe9e1;border:1px solid #f3c8b5;border-radius:8px;font:15px/1.6 Arial,sans-serif;color:#17191c"><strong>Track it yourself.</strong> Your repair is ticket #${escapeHtml(
+              String(record.trackerTicketNumber)
+            )}. <a href="${escapeHtml(trackUrl(env, record))}" style="color:#c2410c">Open your repair status</a> any time to see where it is, approve the quote, or pay an invoice.</p>`
+          : ""
+      }
       <p style="margin:0 0 6px;font:600 14px Arial,sans-serif;color:#666b73">What you sent</p>
       <p style="margin:0 0 14px;padding:14px;background:#f4f1ea;color:#17191c;font:14px/1.6 Arial,sans-serif">${escapeHtml(
         record.device
@@ -769,8 +1120,8 @@ function customerHtml(record, env) {
   </table></body></html>`;
 }
 
-function customerText(record) {
-  return [
+function customerText(record, env) {
+  const lines = [
     `Hi ${record.name},`,
     "",
     `We've got your repair request. Your reference is ${record.reference}.`,
@@ -782,13 +1133,26 @@ function customerText(record) {
     `Fault: ${record.faultLabel}`,
     "",
     "Diagnosis is free. You'll get a written quote before any work. Every repair includes a 90-day workmanship warranty.",
-    "",
+    ""
+  ];
+
+  if (trackUrl(env, record)) {
+    lines.push(
+      `Ticket #${record.trackerTicketNumber}: ${trackUrl(env, record)}`,
+      "Open that link any time to see the repair status, approve the quote, or pay an invoice.",
+      ""
+    );
+  }
+
+  lines.push(
     record.mailIn
       ? "What happens next: we reply with the shipping address, then free diagnosis, a written quote, the repair, a 24-hour test, and return shipping with tracking."
       : "What happens next: free diagnosis, a written quote, the repair, a 24-hour test, then collect in person or we ship it back.",
     "",
     "FastFixIt Electronics, LLC"
-  ].join("\n");
+  );
+
+  return lines.join("\n");
 }
 
 function escapeHtml(value) {

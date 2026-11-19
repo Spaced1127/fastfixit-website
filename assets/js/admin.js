@@ -15,6 +15,7 @@
   var actions = document.querySelector("[data-admin-actions]");
   var refreshButton = document.querySelector("[data-admin-refresh]");
   var signoutButton = document.querySelector("[data-admin-signout]");
+  var autoToggle = document.querySelector("[data-admin-auto]");
 
   var token = "";
   var statuses = [
@@ -161,6 +162,100 @@
       save.type = "button";
       statusRow.appendChild(save);
       body.appendChild(statusRow);
+
+      /* Tracker link -------------------------------------------------- */
+      var trackerBox = node("div", "admin-tracker");
+      var trackerBase = String(config.trackerUrl || "").replace(/\/+$/, "");
+
+      if (request.tracker_ticket_number) {
+        var trackerRow = node("div", "admin-tracker__row");
+        trackerRow.appendChild(node("span", "admin-tracker__label", "Tracker"));
+
+        var ticketLink = node("a", "admin-tracker__ticket", "Ticket #" + request.tracker_ticket_number);
+        if (trackerBase && request.tracker_ticket_id) {
+          ticketLink.href = trackerBase + "/app/tickets/" + encodeURIComponent(request.tracker_ticket_id);
+          ticketLink.target = "_blank";
+          ticketLink.rel = "noopener";
+        }
+        trackerRow.appendChild(ticketLink);
+
+        if (request.tracker_status) {
+          trackerRow.appendChild(node("span", "admin-tracker__status", request.tracker_status));
+        }
+        trackerBox.appendChild(trackerRow);
+
+        if (request.track_url) {
+          var copyRow = node("div", "admin-tracker__row");
+          copyRow.appendChild(node("span", "admin-tracker__label", "Customer"));
+          var copy = node("button", "btn btn--sm", "Copy status link");
+          copy.type = "button";
+          copy.addEventListener("click", function () {
+            var link = request.track_url;
+            var done = function () {
+              copy.textContent = "Copied";
+              window.setTimeout(function () {
+                copy.textContent = "Copy status link";
+              }, 1400);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(link).then(done).catch(function () {
+                window.prompt("Copy this link", link);
+              });
+            } else {
+              window.prompt("Copy this link", link);
+            }
+          });
+          copyRow.appendChild(copy);
+          copyRow.appendChild(node("span", "admin-tracker__note", request.track_url));
+          trackerBox.appendChild(copyRow);
+        }
+
+        if (request.tracker_error) {
+          trackerBox.appendChild(node("p", "admin-tracker__error", request.tracker_error));
+        }
+      } else {
+        var idleRow = node("div", "admin-tracker__row");
+        idleRow.appendChild(node("span", "admin-tracker__label", "Tracker"));
+        idleRow.appendChild(node("span", "admin-tracker__note", "Not created"));
+
+        var create = node("button", "btn btn--sm", "Create ticket");
+        create.type = "button";
+        idleRow.appendChild(create);
+        trackerBox.appendChild(idleRow);
+
+        if (request.tracker_error) {
+          trackerBox.appendChild(node("p", "admin-tracker__error", request.tracker_error));
+        }
+
+        create.addEventListener("click", function () {
+          clearAlert();
+          create.disabled = true;
+          create.textContent = "Creating…";
+
+          fetch(base + "/admin/requests/" + encodeURIComponent(request.reference) + "/sync", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + token }
+          })
+            .then(function (response) {
+              return response.json().then(function (result) {
+                return { response: response, result: result };
+              });
+            })
+            .then(function (payload) {
+              if (!payload.response.ok || !payload.result || !payload.result.ok) {
+                throw new Error((payload.result && payload.result.error) || "Could not create the ticket.");
+              }
+              return load(token);
+            })
+            .catch(function (error) {
+              showAlert(error.message || "Could not create the ticket.");
+              create.textContent = "Create ticket";
+              create.disabled = false;
+            });
+        });
+      }
+
+      body.appendChild(trackerBox);
       card.appendChild(body);
 
       save.addEventListener("click", function () {
@@ -245,9 +340,36 @@
         }
         showInbox();
         renderRequests(payload.result.requests || []);
+        loadSettings();
       })
       .catch(function (error) {
         showAlert(error.message || "Could not reach the request inbox.");
+      });
+  }
+
+  function loadSettings() {
+    if (!autoToggle) return;
+    fetch(base + "/admin/settings", {
+      headers: { Authorization: "Bearer " + token }
+    })
+      .then(function (response) {
+        return response.json().then(function (result) {
+          return { response: response, result: result };
+        });
+      })
+      .then(function (payload) {
+        if (!payload.response.ok || !payload.result || !payload.result.ok) return;
+        autoToggle.checked = Boolean(payload.result.autoCreate);
+        if (!payload.result.trackerConfigured) {
+          autoToggle.disabled = true;
+          autoToggle.parentElement.setAttribute(
+            "title",
+            "Set TRACKER_URL and the TRACKER_INTAKE_TOKEN secret on the Worker."
+          );
+        }
+      })
+      .catch(function () {
+        /* Settings are a convenience; the inbox still works without them. */
       });
   }
 
@@ -271,6 +393,40 @@
   if (refreshButton) {
     refreshButton.addEventListener("click", function () {
       load(token);
+    });
+  }
+
+  if (autoToggle) {
+    autoToggle.addEventListener("change", function () {
+      clearAlert();
+      autoToggle.disabled = true;
+
+      fetch(base + "/admin/settings", {
+        method: "PATCH",
+        headers: {
+          Authorization: "Bearer " + token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ autoCreate: autoToggle.checked })
+      })
+        .then(function (response) {
+          return response.json().then(function (result) {
+            return { response: response, result: result };
+          });
+        })
+        .then(function (payload) {
+          if (!payload.response.ok || !payload.result || !payload.result.ok) {
+            throw new Error((payload.result && payload.result.error) || "Could not save the setting.");
+          }
+          autoToggle.checked = Boolean(payload.result.autoCreate);
+        })
+        .catch(function (error) {
+          autoToggle.checked = !autoToggle.checked;
+          showAlert(error.message || "Could not save the setting.");
+        })
+        .finally(function () {
+          autoToggle.disabled = false;
+        });
     });
   }
 

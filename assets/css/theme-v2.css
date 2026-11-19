@@ -1231,6 +1231,67 @@ input[type="checkbox"] {
   white-space: pre-wrap;
 }
 
+.admin-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 4px;
+  color: var(--ink);
+  font-size: 0.875rem;
+}
+
+.admin-toggle input {
+  width: 16px;
+  height: 16px;
+}
+
+.admin-tracker {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--surface-muted);
+  border-radius: var(--radius);
+}
+
+.admin-tracker__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.admin-tracker__label {
+  min-width: 62px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-tracker__ticket {
+  color: var(--accent);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-tracker__ticket:hover {
+  text-decoration: underline;
+}
+
+.admin-tracker__status,
+.admin-tracker__note {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-tracker__error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.8125rem;
+}
+
 .admin-empty {
   padding: 48px 24px;
   border: 0;
