@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS repair_requests (
   email TEXT NOT NULL,
   phone TEXT,
   contact TEXT,
+  source TEXT,
+  source_detail TEXT,
   device TEXT,
   device_id TEXT,
   model TEXT,

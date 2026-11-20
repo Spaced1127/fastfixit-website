@@ -32,5 +32,13 @@ window.FFI_CONFIG = {
   siteUrl: "https://fastfixitelectronics.com",
 
   // RepairTrackerV2. The inbox links tickets and customer status pages here.
-  trackerUrl: "https://tracker.fastfixitelectronics.com"
+  trackerUrl: "https://tracker.fastfixitelectronics.com",
+
+  // Google Business Profile review link. Paste the short review link here
+  // (for example https://g.page/r/.../review) to activate review.html.
+  reviewUrl: "",
+
+  // Cloudflare Web Analytics beacon token. Leave empty until Web Analytics
+  // is enabled for the site in the Cloudflare dashboard.
+  cloudflareAnalyticsToken: ""
 };

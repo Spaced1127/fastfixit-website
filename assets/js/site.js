@@ -224,38 +224,14 @@
     });
   }
 
-  function initStructuredData() {
-    if (!config.siteUrl || isPlaceholder(config.siteUrl)) return;
-    if (isPlaceholder(config.phone) || isPlaceholder(config.city)) return;
-
-    var payload = {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      name: "FastFixIt Electronics, LLC",
-      url: config.siteUrl,
-      image: config.siteUrl.replace(/\/$/, "") + "/assets/img/bench-wide.webp",
-      telephone: config.phone,
-      priceRange: "$$",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: config.city,
-        addressRegion: config.region || undefined,
-        postalCode: config.postal || undefined,
-        addressCountry: config.country || "US"
-      },
-      areaServed: {
-        "@type": "City",
-        name: config.city
-      }
-    };
-
-    if (config.hours && !isPlaceholder(config.hours)) {
-      payload.openingHours = config.hours;
-    }
+  function initAnalytics() {
+    var token = (config.cloudflareAnalyticsToken || "").trim();
+    if (!token || isPlaceholder(token)) return;
 
     var script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.textContent = JSON.stringify(payload);
+    script.defer = true;
+    script.src = "https://static.cloudflareinsights.com/beacon.min.js";
+    script.setAttribute("data-cf-beacon", JSON.stringify({ token: token }));
     document.head.appendChild(script);
   }
 
@@ -268,7 +244,7 @@
     initYear();
     initDiagnosticFee();
     initThemeToggle();
-    initStructuredData();
+    initAnalytics();
   }
 
   if (document.readyState === "loading") {

@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /review.html
+Disallow: /404.html
+
+Sitemap: https://fastfixitelectronics.com/sitemap.xml

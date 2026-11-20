@@ -160,6 +160,51 @@
     return label ? label.textContent.trim() : el.value;
   }
 
+  function attribution() {
+    var params = new URLSearchParams(window.location.search);
+    var bits = [];
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach(function (key) {
+      var value = (params.get(key) || "").trim();
+      if (value) bits.push(key + "=" + value.slice(0, 60));
+    });
+    if (params.get("gclid") || params.get("gbraid") || params.get("wbraid")) {
+      bits.push("google-click-id");
+    }
+    try {
+      if (document.referrer) {
+        var ref = new URL(document.referrer);
+        if (ref.hostname && ref.hostname !== window.location.hostname) {
+          bits.push("referrer=" + ref.hostname.slice(0, 80));
+        }
+      }
+    } catch (error) {
+      /* Referrer is optional. */
+    }
+    return bits.join(" · ").slice(0, 300);
+  }
+
+  function prefillSource() {
+    var select = document.getElementById("source");
+    if (!select || select.value) return;
+    var params = new URLSearchParams(window.location.search);
+    var byUtm = {
+      google: "Google search",
+      googleads: "Google search",
+      adwords: "Google search",
+      facebook: "Facebook",
+      fb: "Facebook",
+      instagram: "Facebook",
+      nextdoor: "Nextdoor",
+      mail: "Mail-in",
+    };
+    var utm = (params.get("utm_source") || "").trim().toLowerCase();
+    if (params.get("gclid") || params.get("gbraid") || params.get("wbraid")) {
+      select.value = "Google search";
+    } else if (byUtm[utm]) {
+      select.value = byUtm[utm];
+    }
+  }
+
   function validate() {
     var errors = [];
     var name = value("name");
@@ -452,6 +497,7 @@
       email: value("email"),
       phone: value("phone"),
       contact: radioLabel("contactMethod"),
+      source: value("source"),
       deviceId: value("deviceType"),
       device: labelOf("deviceType"),
       model: value("model"),
@@ -488,6 +534,8 @@
       "Email: " + summary.email,
       "Phone: " + (summary.phone || "—"),
       "Preferred contact: " + summary.contact,
+      "Heard about us: " + (summary.source || "—"),
+      "Campaign: " + (attribution() || "—"),
       "Device: " + summary.device,
       "Make and model: " + (summary.model || "—"),
       "Serial: " + (summary.serial || "—"),
@@ -551,6 +599,8 @@
         email: summary.email,
         phone: summary.phone,
         contact: summary.contact,
+        source: summary.source,
+        sourceDetail: attribution(),
         deviceId: summary.deviceId,
         device: summary.device,
         model: summary.model,
@@ -630,6 +680,7 @@
 
   form.addEventListener("submit", submit);
   prefill();
+  prefillSource();
   syncMailIn();
   initTurnstile();
 })();

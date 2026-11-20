@@ -124,6 +124,8 @@
 
       addField(fields, "Contact", [request.email, request.phone].filter(Boolean).join(" · "));
       addField(fields, "Preferred contact", request.contact);
+      addField(fields, "Heard about us", request.source);
+      if (request.source_detail) addField(fields, "Campaign / referrer", request.source_detail, true);
       addField(fields, "Device", [request.device, request.model].filter(Boolean).join(" · "));
       addField(fields, "Fault", request.fault_label);
       addField(fields, "Handoff", request.handoff);

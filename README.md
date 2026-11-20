@@ -16,10 +16,13 @@ No build step. Upload the files and the site runs.
 | --- | --- | --- |
 | Home | `index.html` | Hero, free-diagnosis/90-day promise band, live bench estimate, services, process, test standards, shop, FAQ, contact |
 | Services | `services.html` | Rate card, console / controller / computer / board-level detail, scope, warranty |
+| PS5 / Xbox HDMI | `ps5-hdmi-repair-kinston.html` | Local landing page: symptoms, price, drop-off area, FAQs, Service + FAQ schema |
+| Switch drift | `switch-drift-repair-kinston.html` | Local landing page: drift symptoms, price, drop-off area, FAQs, Service + FAQ schema |
 | Mail-in | `mail-in.html` | Mail-in process, packing list, shipping and returns, mail-in request CTA |
 | About | `about.html` | The shop, how we work, equipment, photographs |
 | Start a repair | `request.html` | Intake form for drop-off or mail-in, photo attachments, success state |
 | Request inbox | `admin.html` | Private, token-gated list of website requests and status updates (noindex, not linked publicly) |
+| Review cards | `review.html` | Printable 3.5 × 2 in review cards with a QR code from `reviewUrl` (noindex) |
 | Privacy | `privacy.html` | Plain-language privacy note |
 | 404 | `404.html` | Not-found page |
 
@@ -42,7 +45,9 @@ country: "US",
 hours: "Mon-Sat 9AM-7PM",
 formEndpoint: "https://api.fastfixitelectronics.com/repair-request",
 turnstileSiteKey: "0x4AAAAAAGIeVmCJ8hgSB8JN",
-siteUrl: "https://fastfixitelectronics.com"
+siteUrl: "https://fastfixitelectronics.com",
+  reviewUrl: "",
+  cloudflareAnalyticsToken: ""
 ```
 
 There is **no storefront**, so there is no street address or postal code in the config or the markup. Pages show `city, region` only, with drop-off described as by appointment. Empty values show a clearly marked bracket placeholder such as `[PHONE]` or `[CITY]`.
@@ -343,13 +348,18 @@ file names.
 ### Database migration
 
 The tracker columns and the settings table are in
-`worker/migrations/002-tracker.sql`:
+`worker/migrations/002-tracker.sql`; the lead-source columns are in
+`worker/migrations/003-source.sql`:
 
 ```powershell
 npx wrangler d1 execute fastfixit-requests --remote --file=migrations/002-tracker.sql
+npx wrangler d1 execute fastfixit-requests --remote --file=migrations/003-source.sql
 ```
 
-Fresh installs get the same columns from `schema.sql`.
+The request form asks **How did you hear about us?** and stores it in `source`.
+UTM parameters, Google click IDs, and the referring host are stored in
+`source_detail`. Both appear in the shop email and the admin request card. Fresh
+installs get the same columns from `schema.sql`.
 
 ### Invoices and payment
 
@@ -402,15 +412,28 @@ node -e "const fs=require('fs');for(const f of ['index.html','services.html','ma
 
 Replace `NEWVERSION` with today's date and a letter, such as `20261119c`.
 
-### Sitemap and social preview
+### Sitemap, structured data and analytics
 
-There is no `sitemap.xml` because the site is still being moved to its domain. Submit the domain in Google Search Console when it is live. Add an Open Graph image after a real photo is available:
+`sitemap.xml` and `robots.txt` are at the repository root. Submit
+`https://fastfixitelectronics.com/sitemap.xml` in Google Search Console and Bing
+Webmaster Tools after deployment.
 
-```html
-<meta property="og:image" content="https://fastfixitelectronics.com/assets/img/bench-wide.webp">
-```
+`index.html` and the two local landing pages carry static JSON-LD:
+`LocalBusiness`, `Service`, `FAQPage`, and `BreadcrumbList`. The business schema
+uses Kinston and the surrounding towns as `areaServed`, with no street address.
+Keep the prices and area list in sync with the visible copy.
 
-The spec wants an absolute URL.
+For privacy-friendly analytics, enable **Cloudflare Web Analytics** for the site
+and paste the beacon token into `cloudflareAnalyticsToken` in `config.js`.
+`site.js` loads the beacon only when that value is set. Do not also enable the
+automatic Cloudflare injection for the same host, or pageviews will double-count.
+
+### Review cards
+
+Create the Google Business Profile, copy its review link, and paste it into
+`reviewUrl` in `config.js`. Open `review.html`, print on card stock at 3.5 × 2 in,
+and put one in every return bag. Until `reviewUrl` is set, the page shows a setup
+note instead of a QR code. The page is `noindex`.
 
 ---
 

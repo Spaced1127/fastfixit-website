@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review cards | FastFixIt Electronics</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f4f1ea">
+  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/site.css?v=20261120a">
+  <link rel="stylesheet" href="assets/css/theme-v2.css?v=20261120a">
+  <script src="assets/js/boot.js?v=20261120a"></script>
+  <style>
+    .review-main { padding-top: 2rem; padding-bottom: 3rem; }
+    .review-stage { display: flex; justify-content: center; padding: 2.5rem 0; }
+    .review-card {
+      width: 3.5in;
+      height: 2in;
+      background: #ffffff;
+      color: #17191c;
+      border: 1px solid #d9d5cb;
+      border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(23, 25, 28, 0.12);
+      padding: 0.16in;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: "Archivo Variable", Archivo, Arial, sans-serif;
+    }
+    .review-card__top { display: flex; align-items: center; gap: 8px; }
+    .review-card__top img { width: 28px; height: 28px; }
+    .review-card__name { margin: 0; font-size: 10px; font-weight: 700; letter-spacing: 0.01em; }
+    .review-card__tag { margin: 1px 0 0; font-size: 6.5px; color: #666b73; text-transform: uppercase; letter-spacing: 0.08em; }
+    .review-card__body { display: flex; align-items: center; gap: 10px; flex: 1; padding: 6px 0; }
+    .review-card__copy { flex: 1; }
+    .review-card__copy h2 { margin: 0 0 3px; font-size: 13px; line-height: 1.15; }
+    .review-card__copy p { margin: 0; font-size: 8.5px; line-height: 1.35; color: #4b5158; }
+    .review-card__qr { width: 0.95in; height: 0.95in; flex: none; display: grid; place-items: center; }
+    .review-card__qr svg { width: 100%; height: 100%; display: block; }
+    .review-qr__empty { font-size: 7px; color: #b42318; text-align: center; }
+    .review-card__foot { margin: 0; padding-top: 3px; border-top: 1px solid #ece8df; font-size: 6.5px; color: #666b73; }
+    .review-note { max-width: 42rem; margin: 0 auto 1rem; padding: 0.85rem 1rem; border: 1px solid #d9d5cb; border-radius: 10px; background: #fff8ef; color: #7a4a20; font-size: 0.9rem; }
+    @media print {
+      @page { size: 3.5in 2in; margin: 0; }
+      body { background: #ffffff; }
+      body * { visibility: hidden; }
+      .review-card, .review-card * { visibility: visible; }
+      .review-card {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 3.5in;
+        height: 2in;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="index.html" aria-label="FastFixIt Electronics home">
+        <img class="brand-badge" src="assets/brand/badge-96.png" width="46" height="46" alt="">
+        <span class="brand-text">
+          <span class="brand-name">FastFixIt</span>
+          <span class="brand-sub">Electronics</span>
+        </span>
+      </a>
+      <nav class="nav" id="site-nav" aria-label="Primary">
+        <a href="services.html">Services</a>
+        <a href="mail-in.html">Mail-in</a>
+        <a href="index.html#process">How it works</a>
+        <a href="about.html">About</a>
+        <a href="index.html#faq">FAQ</a>
+        <a class="nav-cta" href="request.html">Start a repair</a>
+      </nav>
+      <div class="header-actions">
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Toggle dark mode">
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+        <a class="btn btn--sm" href="request.html">Start a repair</a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" class="shell review-main">
+    <div class="page-head">
+      <div>
+        <h1>Review cards.</h1>
+        <p class="lede">Print these on card stock and put one in every return bag. The QR code opens your Google review page. Set <code>reviewUrl</code> in <code>assets/js/config.js</code> once the Google Business Profile is live.</p>
+      </div>
+      <div class="review-controls" data-review-actions hidden>
+        <button class="btn" type="button" data-review-print>Print cards</button>
+        <a class="text-link" data-review-link href="#" target="_blank" rel="noopener">Open review link</a>
+      </div>
+    </div>
+
+    <p class="review-note" data-review-setup hidden>
+      The review link is not set yet. Create the Google Business Profile, copy its review link, and paste it into
+      <code>reviewUrl</code> in <code>assets/js/config.js</code>. This page will then generate the QR code.
+    </p>
+
+    <div class="review-stage">
+      <div class="review-card" id="review-card">
+        <div class="review-card__top">
+          <img src="assets/brand/badge-96.png" width="28" height="28" alt="">
+          <div>
+            <p class="review-card__name">FastFixIt Electronics</p>
+            <p class="review-card__tag">Free diagnosis · 90-day warranty</p>
+          </div>
+        </div>
+        <div class="review-card__body">
+          <div class="review-card__copy">
+            <h2>Happy with the repair?</h2>
+            <p>Scan to leave a Google review. It helps a one-bench shop get found.</p>
+          </div>
+          <div class="review-card__qr" id="review-qr"></div>
+        </div>
+        <p class="review-card__foot">Kinston, NC · 252-320-1212 · fastfixitelectronics.com</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-legal">
+        <p>© <span data-year>2026</span> FastFixIt Electronics, LLC. All rights reserved.</p>
+        <nav aria-label="Legal">
+          <a href="privacy.html">Privacy</a>
+          <a href="index.html#contact">Contact</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/vendor/qrcode.js?v=20261120a" defer></script>
+  <script src="assets/js/config.js?v=20261120a" defer></script>
+  <script src="assets/js/site.js?v=20261120a" defer></script>
+  <script src="assets/js/review.js?v=20261120a" defer></script>
+</body>
+</html>
