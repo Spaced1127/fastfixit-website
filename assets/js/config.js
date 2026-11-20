@@ -34,9 +34,10 @@ window.FFI_CONFIG = {
   // RepairTrackerV2. The inbox links tickets and customer status pages here.
   trackerUrl: "https://tracker.fastfixitelectronics.com",
 
-  // Google Business Profile review link. Paste the short review link here
-  // (for example https://g.page/r/.../review) to activate review.html.
-  reviewUrl: "",
+  // Google Business Profile review link. This opens the profile with a
+  // "Write a review" button. Replace it with the g.page/r/.../review link from
+  // the Business Profile dashboard ("Ask for reviews") when you have it.
+  reviewUrl: "https://www.google.com/search?ludocid=536773036687506683&q=FastFixIt+Electronics+LLC",
 
   // Cloudflare Web Analytics beacon token. Leave empty until Web Analytics
   // is enabled for the site in the Cloudflare dashboard.
