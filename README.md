@@ -18,6 +18,8 @@ No build step. Upload the files and the site runs.
 | Services | `services.html` | Rate card, console / controller / computer / board-level detail, scope, warranty |
 | PS5 / Xbox HDMI | `ps5-hdmi-repair-kinston.html` | Local landing page: symptoms, price, drop-off area, FAQs, Service + FAQ schema |
 | Switch drift | `switch-drift-repair-kinston.html` | Local landing page: drift symptoms, price, drop-off area, FAQs, Service + FAQ schema |
+| Greenville | `greenville-console-repair.html` | ECU-focused page: appointment drop-off trips, prices, FAQs, Service + FAQ schema |
+| Goldsboro | `goldsboro-console-repair.html` | Seymour Johnson AFB-focused page: appointment drop-off trips, second opinions, FAQs |
 | Mail-in | `mail-in.html` | Mail-in process, packing list, shipping and returns, mail-in request CTA |
 | About | `about.html` | The shop, how we work, equipment, photographs |
 | Start a repair | `request.html` | Intake form for drop-off or mail-in, photo attachments, success state |
@@ -72,6 +74,11 @@ Return shipping is quoted before the device goes back. The customer pays inbound
 ### 4. Photographs
 
 The site now uses the shop's own photos, cropped from the originals in `photos/`. That folder is source material and is ignored by git; the published copies are the `assets/img/*.webp` files.
+
+The Greenville and Goldsboro pages also use two licensed local photos:
+`ecu-campus.webp` (Ecu2020, CC BY-SA 4.0) and `sjafb-f15e.webp` (U.S. Air
+Force, public domain). Sources, authors, and changes are listed in
+`assets/img/CREDITS.md`; keep that file with the images.
 
 | File | Crop | Source | Shows |
 | --- | --- | --- | --- |
