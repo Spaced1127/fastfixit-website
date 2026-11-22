@@ -2553,6 +2553,164 @@ input[type="radio"] {
   }
 }
 
+/* ---------- price story ---------- */
+
+.kicker {
+  margin: 0 0 14px;
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.price-story {
+  padding-top: clamp(36px, 4vw, 56px);
+}
+
+.price-story__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+
+.price-story__copy h2 {
+  max-width: 14ch;
+}
+
+.price-story__copy p {
+  max-width: 54ch;
+}
+
+.price-signature {
+  margin-top: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.price-note {
+  position: relative;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 0 1px 0 var(--line);
+}
+
+.price-note__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--line-strong);
+  color: var(--muted);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.price-note__lede {
+  margin: 18px 0 8px;
+  font-weight: 600;
+}
+
+.price-note ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.price-note li {
+  display: flex;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+.price-note li::before {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-top: 0.45em;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.price-note__compare {
+  display: grid;
+  gap: 10px;
+  margin: 20px 0 14px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.price-note__compare div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.price-note__compare span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.price-note__compare strong {
+  font-size: 1.05rem;
+}
+
+.price-note__compare div:last-child strong {
+  color: var(--accent);
+}
+
+.price-note__foot {
+  margin: 0;
+  padding-right: 110px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.price-stamp {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  max-width: 104px;
+  padding: 6px 8px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  color: var(--accent);
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(-6deg);
+}
+
+@media (max-width: 900px) {
+  .price-story__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .price-note__foot {
+    padding-right: 0;
+  }
+
+  .price-stamp {
+    position: static;
+    display: inline-block;
+    margin-top: 16px;
+    transform: rotate(-2deg);
+  }
+}
+
 /* ---------- print ---------- */
 
 @media print {
