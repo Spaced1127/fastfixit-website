@@ -450,6 +450,33 @@ note instead of a QR code. The page is `noindex`.
 
 ---
 
+## Email
+
+Inbound mail is handled by **Cloudflare Email Routing** for
+`fastfixitelectronics.com`:
+
+- `repairs@fastfixitelectronics.com` and `website@fastfixitelectronics.com`
+  forward to `mtlewis1127@gmail.com`.
+- `consolefix.nc@gmail.com` is a verified Cloudflare destination. Cloudflare
+  allows one destination per address, so copying to that inbox needs a Gmail
+  filter/forward after Google finishes its forwarding verification.
+- Resend's inbound MX record was removed. Cloudflare's MX, SPF and DKIM records
+  are in place; Resend still sends the site's outbound mail through its `send.`
+  subdomain and DKIM record.
+
+Outbound replies use Gmail's **Send mail as** for
+`repairs@fastfixitelectronics.com` through:
+
+```text
+Server: smtp.resend.com
+Port:   587 (TLS)
+User:   resend
+Pass:   Resend API key scoped to fastfixitelectronics.com
+```
+
+Do not enable Resend receiving on the root domain while Cloudflare Email
+Routing is active.
+
 ## Design notes
 
 - **Tracker V2 match:** warm canvas, white surfaces, ink, burnt-orange accent, Archivo, 8/12px radii, flat tone-separated cards and a light/dark toggle. The accent is `#c2410c` in light (a slightly darker burnt orange for text contrast) and `#ff7a3d` in dark. The tracker default is `#d9480f`; change `--accent` in `theme-v2.css` if you want the exact value.
