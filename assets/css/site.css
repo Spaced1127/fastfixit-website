@@ -2450,7 +2450,8 @@ input[type="radio"] {
 
 @media (max-width: 560px) {
   .about-strip {
-    gap: 6px;
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .about-strip figcaption {

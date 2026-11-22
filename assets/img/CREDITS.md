@@ -1,7 +1,11 @@
 # Image credits
 
-The shop photos are the owner's own work. These two local photos are used under
-the licenses below and are cropped to a 21:9 banner.
+All images in this folder are the shop's own photographs, except for the two
+licensed local photos listed below. The shop photos are cropped and converted to
+WebP for the site.
+
+The two local photos are used under the licenses below and are cropped to a 21:9
+banner.
 
 ## ECU campus
 

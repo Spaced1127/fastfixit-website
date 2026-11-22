@@ -80,6 +80,12 @@ The Greenville and Goldsboro pages also use two licensed local photos:
 Force, public domain). Sources, authors, and changes are listed in
 `assets/img/CREDITS.md`; keep that file with the images.
 
+The recent bench-work gallery and the PS5 before/after section use the newer
+source photos in `photos/` (`ps5_hdmi_replacement`, `PS5_rear_before/after`,
+`Xbox_Series_S_HDMI_removed/replaced`, `some_else_attempted`, `after_we_fixed`,
+`waterdamagedswitch`, `dirty_ps5`, `IMG_1631`). They are cropped to WebP in
+`assets/img/`; keep the originals out of git.
+
 | File | Crop | Source | Shows |
 | --- | --- | --- | --- |
 | `bench-solder.webp` | 4:5 | `IMG_0404.heic` | Fitted HDMI port, close up |
